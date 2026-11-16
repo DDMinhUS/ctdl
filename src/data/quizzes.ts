@@ -9,7 +9,7 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     question: 'Đúng hay Sai: Mergesort thực hiện ~2n log₂ n phép so sánh khi sắp xếp mảng bất kỳ gồm 2n phần tử (cả trường hợp tốt nhất và xấu nhất).',
     options: ['Đúng', 'Sai'],
     correctIndex: 1,
-    explanation: 'SAI. Mergesort trên mảng cỡ N dùng tối đa ~N lg N phép so sánh (hoặc giữa 1/2 N lg N và N lg N). Với mảng cỡ 2n, số phép so sánh là ~2n lg(2n) chứ không phải ~2n lg n cho cả tốt nhất và xấu nhất — đặc biệt trường hợp tốt nhất (2 nửa đã có thứ tự rời nhau) chỉ tốn ~n lg n phép so sánh (1/2 N lg N)!',
+    explanation: 'SAI. Với mảng cỡ N = 2n: trường hợp xấu nhất tốn ~N lg N = ~2n lg(2n) ~ 2n lg n phép so sánh (đúng), NHƯNG trường hợp tốt nhất (khi 2 nửa có thứ tự rời nhau, hết 1 nửa sau N/2 bước) chỉ tốn ~1/2 N lg N = ~n lg n phép so sánh — không phải ~2n lg n cho cả hai trường hợp!',
     trapNote: 'Bẫy giữa "truy nhập mảng" (~6N lg N) và "phép so sánh" (1/2 N lg N đến N lg N).',
   },
   {
@@ -64,7 +64,7 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     question: 'Đúng hay Sai: Khi chèn 1 key vào cây BST đỏ-đen nghiêng trái (LLRB), có thể xảy ra chuỗi liên tiếp 2 (hoặc hơn) bước `rotateLeft` mà không có `flipColors` hay `rotateRight` xen giữa.',
     options: ['Đúng', 'Sai'],
     correctIndex: 1,
-    explanation: 'SAI! Trong LLRB, tại mỗi nút trên đường quay lui chỉ thực hiện tối đa MỘT `rotateLeft`. Nếu vừa xoay trái xong, nút con trái vừa tạo ra liên kết đỏ; lên tầng cha phía trên nếu cha nhận đỏ từ con trái thì chỉ có thể kích hoạt `rotateRight` hoặc `flipColors`, KHÔNG bao giờ kích hoạt `rotateLeft` liên tiếp ngay được!',
+    explanation: 'SAI! Tại mỗi tầng h: nếu h là con trái, quay lên cha thì liên kết đỏ nằm bên trái nên cha chỉ có thể kích hoạt `rotateRight` hoặc `flipColors`; nếu h là con phải, trong LLRB ban đầu không có liên kết đỏ nghiêng phải nên h bắt buộc có màu ĐEN, sau `rotateLeft(h)` gốc mới kế thừa màu ĐEN của h nên cha phía trên vẫn có con phải ĐEN (trừ khi `flipColors(h)` chạy xen giữa) — do đó KHÔNG thể kích hoạt `rotateLeft` liên tiếp ngay được!',
     trapNote: 'Nhớ 3 bước ở mỗi tầng: rotateLeft -> rotateRight -> flipColors.',
   },
   {
@@ -171,24 +171,24 @@ export const ESSAY_QUESTIONS: EssayQuestion[] = [
       'Chú ý nhánh `if (i > mid)` hoặc `else if (j > hi)` khi hết một nửa thì KHÔNG cần đọc `aux[j] < aux[i]` nữa!',
     ],
     rubricCriteria: [
-      'Đếm đúng vòng 1 (copy): mỗi bước 2 lần truy nhập (đọc a[k], ghi aux[k]) -> 2N lần.',
-      'Đếm đúng vòng 2 trường hợp tốt nhất (ví dụ nửa trái nhỏ hơn hoàn toàn nửa phải, hoặc ngược lại): N/2 lần đầu mỗi lần đọc 2 để so sánh + 1 đọc + 1 ghi = 4*(N/2) = 2N; N/2 lần sau rơi vào i > mid hoặc j > hi chỉ tốn 1 đọc + 1 ghi = 2*(N/2) = N. Tổng ~5N (khoảng ~4N đến ~5N).',
+      'Đếm đúng vòng 1 (copy): chạy N lần, mỗi bước 2 lần truy nhập (đọc a[k], ghi aux[k]) -> 2N lần.',
+      'Đếm đúng vòng 2 trường hợp tốt nhất (hết một nửa sớm sau ~N/2 bước, chính xác với mid = N/2 là nửa phải gồm N/2 - 1 phần tử): ~N/2 bước đầu đọc 2 (aux[j] < aux[i]) + chép 2 = ~2N; ~N/2 bước sau rơi vào i > mid hoặc j > hi không so sánh aux nên chỉ chép 2 = ~N. Tổng toán học chính xác ~5N (đáp án chuẩn UET ghi nhận khoảng ~4N đến ~6N).',
       'Đếm đúng trường hợp tồi nhất (hai nửa xen kẽ nhau gần hết): gần N bước phải so sánh aux[j] < aux[i] (2 lần) + chép (2 lần) = ~4N. Cộng vòng 1 -> ~6N.',
-      'Kết luận tổng quát: Cả best-case và worst-case đều có thời gian chạy tuyến tính Θ(N) (từ ~4N đến ~6N truy nhập mảng).',
+      'Kết luận tổng quát: Cả best-case và worst-case đều có thời gian chạy tuyến tính Θ(N) (khoảng ~4N–5N đến ~6N truy nhập mảng).',
     ],
     modelAnswer: `1. Vòng lặp 1 (copy a sang aux): chạy N lần, mỗi lần thực hiện 1 lần đọc a[k] và 1 lần ghi aux[k] => 2N lần truy nhập mảng.
 
 2. Vòng lặp 2 (trộn từ aux về a): chạy N lần.
-- Trường hợp tốt nhất (khi toàn bộ nửa trái <= nửa phải hoặc ngược lại, hết một nửa sau N/2 bước):
-  + N/2 bước đầu: kiểm tra aux[j] < aux[i] (2 truy nhập) + đọc gán a[k] = aux[...] (2 truy nhập) = 4*(N/2) = 2N.
-  + N/2 bước sau: rơi vào nhánh i > mid hoặc j > hi nên không so sánh aux, chỉ tốn a[k] = aux[...] (2 truy nhập) = N.
-  => Tổng tốt nhất: 2N + 3N = 5N (nếu mid = N/2 làm 1 bên ngắn hơn chút xấp xỉ ~4N–5N).
+- Trường hợp tốt nhất (khi một nửa hết sớm trước, chẳng hạn toàn bộ nửa phải [N/2+1..N-1] nhỏ hơn aux[0]):
+  + Khoảng N/2 bước đầu: so sánh aux[j] < aux[i] (2 đọc) + gán a[k] = aux[...] (1 đọc + 1 ghi) = 4*(N/2) = 2N.
+  + Khoảng N/2 bước sau: rơi vào nhánh i > mid hoặc j > hi nên bỏ qua phép so sánh aux, chỉ tốn a[k] = aux[...] (2 truy nhập) = N.
+  => Tổng chính xác về mặt toán học: 2N + 3N = ~5N (cụ thể 5N - 2 với N chẵn; lưu ý đáp án chấm thi chính thức của UET chấp nhận khoảng ~4N đến ~6N).
 
-- Trường hợp tồi nhất (phần tử hai nửa xen kẽ đến phần tử cuối cùng):
+- Trường hợp tồi nhất (phần tử hai nửa xen kẽ nhau tới tận phần tử cuối cùng):
   + Gần như cả N bước đều chạy qua phép so sánh aux[j] < aux[i] (2 truy nhập) + phép gán a[k] = aux[...] (2 truy nhập) = ~4N.
   => Tổng tồi nhất: 2N + 4N = ~6N truy nhập mảng.
 
-Kết luận: Cả trường hợp tốt nhất và tồi nhất đều có độ phức tạp tuyến tính Θ(N) (khoảng ~4N đến ~6N lần truy nhập mảng).`,
+Kết luận: Cả trường hợp tốt nhất và tồi nhất đều có độ phức tạp tuyến tính Θ(N) (từ ~4N–5N đến ~6N lần truy nhập mảng).`,
     keyPoints: ['2n', '6n', '4n|5n', 'tuyến tính|θ(n)|o(n)'],
   },
   {
@@ -323,7 +323,7 @@ c. So sánh tình trạng hai bảng, bảng nào có hiệu năng tìm kiếm t
     modelAnswer: `Giá trị băm h(x) = x mod 11:
 34->1, 45->1, 14->3, 11->0, 0->0, 28->6, 22->0, 78->1, 20->9, 5->5, 33->0.
 
-a. Separate Chaining (mỗi ô là danh sách các khóa cùng hash):
+a. Separate Chaining (mỗi ô là danh sách các khóa cùng hash — vẽ nối đuôi theo thứ tự chèn; nếu dùng SequentialSearchST chèn đầu thì danh sách đảo ngược như [0]: 33->22->0->11, cả hai đều đúng):
 [0]: 11 -> 0 -> 22 -> 33
 [1]: 34 -> 45 -> 78
 [2]: rỗng
@@ -362,8 +362,8 @@ Ví dụ N=6, cạnh: (0,3), (0,5), (1,2), (1,4), (1,5), (2,3), (2,4), (3,4), (3
       'Mô hình hóa được bài toán về Đồ thị vô hướng (đỉnh = đảo, cạnh = chặng bay an toàn).',
       'Chọn thuật toán BFS (Tìm kiếm theo chiều rộng) xuất phát từ đỉnh 0 trên Danh sách kề.',
       'Dùng mảng marked[], edgeTo[], distTo[] và Queue<Integer> để lưu cha truy vết tuyến đường.',
-      'Truy vết đúng ví dụ: dist 1 = {3, 5}; dist 2 từ 3/5 = {2, 4, 1}. Tuyến đường hợp lệ: 1: 0->5->1, 2: 0->3->2, 3: 0->3, 4: 0->3->4 (hoặc 0->5->4), 5: 0->5.',
-      'Độ phức tạp thời gian: O(N + E) (hay O(V + E)).',
+      'Truy vết đúng ví dụ: dist 1 = {3, 5}; dist 2 từ 3/5 = {2, 4, 1}. Tuyến đường ngắn nhất: 1: 0->5->1, 2: 0->3->2, 3: 0->3, 4: 0->3->4 (hoặc 0->5->4 — chỉ 2 chặng, tối ưu hơn ví dụ in nhầm 0->5->1->4 trong đề), 5: 0->5.',
+      'Độ phức tạp thời gian: O(N + E) hay O(V + E) tổng quát (O(E) nếu đồ thị liên thông).',
     ],
     modelAnswer: `1. Mô hình hóa đồ thị:
 - Đỉnh: N hòn đảo (0..N-1), đỉnh nguồn s = 0.
@@ -383,9 +383,9 @@ Ví dụ N=6, cạnh: (0,3), (0,5), (1,2), (1,4), (1,5), (2,3), (2,4), (3,4), (3
 - Lớp 0 (q=[0]): đỉnh 0
 - Lớp 1 (kề 0): 3, 5 -> edgeTo[3]=0, edgeTo[5]=0 (dist=1)
 - Lớp 2 (từ 3 -> 2, 4; từ 5 -> 1): edgeTo[2]=3, edgeTo[4]=3, edgeTo[1]=5 (dist=2)
-Tuyến đường: 1: 0->5->1; 2: 0->3->2; 3: 0->3; 4: 0->3->4; 5: 0->5.
+Tuyến đường ngắn nhất: 1: 0->5->1; 2: 0->3->2; 3: 0->3; 4: 0->3->4 (hoặc 0->5->4, ngắn hơn ví dụ 0->5->1->4 trong đề); 5: 0->5.
 
-5. Độ phức tạp: Thời gian O(N + E), Bộ nhớ O(N + E).`,
+5. Độ phức tạp: Thời gian O(N + E) (hay O(E) với đồ thị liên thông theo đáp án UET), Bộ nhớ O(N + E).`,
     keyPoints: ['bfs|chiều rộng', 'queue', 'edgeto', 'o(n + e)|o(v + e)|tuyến tính'],
   },
   {

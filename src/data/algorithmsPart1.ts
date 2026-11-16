@@ -95,12 +95,12 @@ export const ALGORITHMS_PART_1: AlgorithmItem[] = [
     topic: 'Union-Find',
     week: 'Tuần 1',
     priority: 'Bắt buộc',
-    timeComplexity: 'Init: N | Find: lg N | Union: lg N',
+    timeComplexity: 'Init: N | Find: <= lg N (gần O(1) amortized với Path Halving)',
     spaceComplexity: 'O(N) hai mảng id[] và sz[]',
-    summary: 'Lưu rừng cây qua mảng cha id[]. Hàm root(i) leo lên gốc; khi union luôn gắn cây nhỏ (sz nhỏ hơn) vào gốc cây lớn để giữ chiều cao <= lg N.',
+    summary: 'Lưu rừng cây qua mảng cha id[]. Hàm root(i) leo lên gốc (có path halving); khi union luôn gắn cây nhỏ (sz nhỏ hơn) vào gốc cây lớn để giữ chiều cao <= lg N.',
     paperTips: [
-      'Phân biệt QuickUnion thường (gắn id[i] = j bất chấp kích thước -> có thể suy biến O(N)) và WeightedQuickUnion (dùng thêm mảng sz[] lưu số nút của cây gốc).',
-      'Nếu đề hỏi Path Compression: thêm `id[i] = id[id[i]];` bên trong vòng `while` của `root(i)` (1 dòng duy nhất!).',
+      'Phân biệt QuickUnion thường (gắn id[i] = j bất chấp kích thước -> có thể suy biến O(N)) và WeightedQuickUnion thuần (bỏ dòng nén đường đi `id[i] = id[id[i]];` thì đạt O(lg N)).',
+      'Trong code chuẩn bên dưới đã bật sẵn Path Compression kiểu Path Halving (`id[i] = id[id[i]];` trong `root(i)` — 1 dòng duy nhất) giúp tốc độ thực tế gần như O(1)!',
     ],
     javaIdioms: [
       { token: 'while (i != id[i]) i = id[i];', meaning: 'Vòng lặp leo ngược lên nút cha cho tới khi gặp gốc (nút có cha là chính nó).' },
@@ -608,7 +608,7 @@ export const ALGORITHMS_PART_1: AlgorithmItem[] = [
     topic: 'Mergesort',
     week: 'Tuần 5',
     priority: 'Bắt buộc',
-    timeComplexity: 'Best/Avg/Worst: <= N lg N compares (~6N lg N array accesses)',
+    timeComplexity: 'Best: ~1/2 N lg N | Avg/Worst: <= N lg N compares (~6N lg N truy nhập mảng)',
     spaceComplexity: 'O(N) mảng phụ aux[] | Stable',
     summary: 'Chia đôi mảng [lo..hi], đệ quy sắp xếp 2 nửa [lo..mid] và [mid+1..hi], rồi trộn 2 nửa đã sắp xếp qua mảng phụ aux[].',
     paperTips: [
@@ -721,7 +721,7 @@ export const ALGORITHMS_PART_1: AlgorithmItem[] = [
     week: 'Tuần 6',
     priority: 'Bắt buộc',
     timeComplexity: 'Avg: ~1.39 N lg N | Worst: ~N²/2 (nếu không shuffle)',
-    spaceComplexity: 'O(lg N) stack đệ quy | In-place | Unstable',
+    spaceComplexity: 'O(lg N) stack trung bình (Worst: O(N)) | In-place | Unstable',
     summary: 'Chọn chốt `a[lo]`, dùng 2 con trỏ `i` (từ lo+1 đi phải) và `j` (từ hi đi trái) phân hoạch mảng thành [< v | v | > v], rồi đệ quy 2 bên.',
     paperTips: [
       'Cực kỳ nhớ `StdRandom.shuffle(a)` trước khi sort để tránh trường hợp xấu nhất O(N²) trên mảng đã sắp xếp!',

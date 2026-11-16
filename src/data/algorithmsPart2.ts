@@ -7,13 +7,13 @@ export const ALGORITHMS_PART_2: AlgorithmItem[] = [
     topic: 'Priority Queue & Heap',
     week: 'Tuần 7',
     priority: 'Bắt buộc',
-    timeComplexity: 'insert: lg N | delMax: lg N | max: 1',
+    timeComplexity: 'insert: <= 1 + lg N | delMax: <= 2 lg N compares (O(lg N)) | max: O(1)',
     spaceComplexity: 'O(N) mảng pq[1..N] (bỏ qua chỉ số 0)',
     summary: 'Cây nhị phân hoàn chỉnh lưu trên mảng chỉ số từ 1: cha của k là k/2, hai con của k là 2k và 2k+1. Nút cha luôn >= hai nút con.',
     paperTips: [
       'Cực hay ra cả code lẫn vẽ trace (Câu 3 Đề 2024-2025!).',
-      'Khi `insert(x)`: tăng `N` trước (`pq[++N] = x;`), rồi gọi `swim(N)`.',
-      'Khi `delMax()`: lấy `pq[1]`, đổi chỗ `exch(1, N--)`, xóa loitering `pq[N+1] = null`, rồi gọi `sink(1)`.',
+      'Khi `insert(x)`: tăng `N` trước (`pq[++N] = x;`), rồi gọi `swim(N)`. Tối đa 1 + lg N phép so sánh.',
+      'Khi `delMax()`: lấy `pq[1]`, đổi chỗ `exch(1, N--)`, xóa loitering `pq[N+1] = null`, rồi gọi `sink(1)`. Tối đa 2 lg N phép so sánh (mỗi tầng: 1 phép chọn con lớn hơn + 1 phép so với cha).',
       'Trong `sink(k)`: vòng lặp `while (2*k <= N)`: chọn con lớn hơn `int j = 2*k; if (j < N && less(j, j+1)) j++;`, nếu `!less(k, j)` thì `break;`!',
     ],
     javaIdioms: [
@@ -153,7 +153,7 @@ export const ALGORITHMS_PART_2: AlgorithmItem[] = [
     topic: 'Priority Queue & Heap',
     week: 'Tuần 7',
     priority: 'Trọng tâm',
-    timeComplexity: 'Worst: <= 2N lg N compares (Xây heap chỉ mất <= 2N)',
+    timeComplexity: 'Best: O(N) (~3N) | Avg/Worst: <= 2N lg N compares (Xây heap <= 2N)',
     spaceComplexity: 'O(1) in-place | Unstable',
     summary: 'Pha 1: Duyệt k từ N/2 về 1 gọi `sink` để biến mảng thành Max-Heap trong O(N). Pha 2: Đổi `a[1]` với `a[N--]` và `sink(a, 1, N)` lặp lại đến N = 1.',
     paperTips: [
@@ -843,7 +843,7 @@ export const ALGORITHMS_PART_2: AlgorithmItem[] = [
     summary: 'Hàm băm `hash(key) = (key.hashCode() & 0x7fffffff) % M`. Separate Chaining dùng mảng danh sách liên kết; Linear Probing dò tuyến tính `(i + 1) % M` trên mảng phẳng.',
     paperTips: [
       'TẠI SAO dùng `& 0x7fffffff` trước `% M`? Vì `hashCode()` trong Java có thể trả về số ÂM (và `Math.abs(Integer.MIN_VALUE)` vẫn âm!). Mặt nạ bit `0x7fffffff` xóa bit dấu để ra số không âm!',
-      'Trong Linear Probing: khi chèn trùng khóa -> ghi đè `vals[i] = val`; khi gặp `null` -> chèn vào ô trống đó. Mảng luôn phải duy trì tải `alpha = N/M <= 1/2` (gấp đôi M khi `N >= M/2`).',
+      'Trong Linear Probing: khi chèn trùng khóa -> ghi đè `vals[i] = val`; khi gặp `null` -> chèn vào ô trống đó. Mảng BẮT BUỘC phải duy trì M > N (thực tế algs4 giữ tải `alpha = N/M <= 1/2`, gấp đôi M khi `N >= M/2`), nếu mảng đầy 100% không còn ô null thì vòng lặp dò sẽ lặp vô hạn!',
       'Khi vẽ bảng băm trên giấy (Câu 5 đề 2024-2025): Linear Probing rất dễ bị hiện tượng **primary clustering** (dồn cục) khi các khóa liên tiếp băm vào cùng cụm ô.',
     ],
     javaIdioms: [
