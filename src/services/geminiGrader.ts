@@ -7,7 +7,7 @@ export const DEFAULT_MODEL = 'gemini-4-hydrogen';
 
 export const AVAILABLE_MODELS = [
   { id: 'gemini-4-hydrogen', label: 'Gemini 4 Hydrogen (Thế hệ 4 — Nhanh, chuẩn code, khuyên dùng)' },
-  { id: 'gemini-4-argon', label: 'Gemini 4 Argon (Thế hệ 4 — Suy luận sâu bài tự luận khó)' },
+  { id: 'gemini-4-argon', label: 'Gemini 4 Argon (Thế hệ 4 — Suy luận sâu, cần quota hỗ trợ)' },
   { id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash (Cân bằng tốc độ & độ chính xác cao)' },
   { id: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash-Lite (Nhẹ, tiết kiệm quota tối đa)' },
 ];
@@ -104,7 +104,7 @@ async function callGeminiWithRotation(
 
   const primaryModel = settings.customModel.trim() || settings.preferredModel || DEFAULT_MODEL;
   const modelCandidates = Array.from(
-    new Set([primaryModel, 'gemini-4-hydrogen', 'gemini-3.8-flash', 'gemini-3.5-flash-lite'])
+    new Set([primaryModel, 'gemini-4-hydrogen', 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite'])
   );
 
   let lastErr = 'Không thể kết nối Gemini API';
@@ -114,6 +114,9 @@ async function callGeminiWithRotation(
   };
 
   for (const keyEntry of sortedKeys) {
+    let saw429ForKey = false;
+    let sawAuthErrorForKey = false;
+
     for (const model of modelCandidates) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(keyEntry.key.trim())}`;
       try {
@@ -134,22 +137,16 @@ async function callGeminiWithRotation(
         if (!res.ok) {
           const errBody = await res.text();
           lastErr = `HTTP ${res.status} (${model}): ${errBody.slice(0, 180)}`;
-          const targetKey = nextSettings.keys.find((k) => k.id === keyEntry.id);
+          if (res.status === 401 || res.status === 403 || (res.status === 400 && /API_KEY|API key/i.test(errBody))) {
+            sawAuthErrorForKey = true;
+            break; // Key invalid/unauthorized -> rotate to next key immediately
+          }
           if (res.status === 429) {
-            if (targetKey) {
-              targetKey.status = 'quota';
-              targetKey.lastError = 'Hết quota (429)';
-            }
-            break; // rotate to next key immediately
+            saw429ForKey = true;
+            // Free tier often sets limit: 0 on heavier models (e.g. gemini-4-argon) while Hydrogen/Flash work; try next model first
+            continue;
           }
-          if (res.status === 400 || res.status === 401 || res.status === 403) {
-            if (targetKey) {
-              targetKey.status = 'invalid';
-              targetKey.lastError = `Lỗi xác thực (${res.status})`;
-            }
-            break; // rotate to next key
-          }
-          // 404 model not found -> try next model with same key
+          // 404 / 503 / model-level error -> try next candidate model on same key
           continue;
         }
 
@@ -172,6 +169,17 @@ async function callGeminiWithRotation(
         return { rawText, usedModel: model, usedKeyLabel: keyEntry.label };
       } catch (err) {
         lastErr = err instanceof Error ? err.message : String(err);
+      }
+    }
+
+    const targetKey = nextSettings.keys.find((k) => k.id === keyEntry.id);
+    if (targetKey) {
+      if (sawAuthErrorForKey) {
+        targetKey.status = 'invalid';
+        targetKey.lastError = 'Lỗi xác thực API Key';
+      } else if (saw429ForKey) {
+        targetKey.status = 'quota';
+        targetKey.lastError = 'Hết quota (429)';
       }
     }
   }
