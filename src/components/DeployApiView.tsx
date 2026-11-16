@@ -10,7 +10,7 @@ import {
   Trash2,
   Wifi,
 } from 'lucide-react';
-import { AVAILABLE_MODELS, testGeminiKey } from '../services/geminiGrader';
+import { AVAILABLE_MODELS, DEFAULT_MODEL, testGeminiKey } from '../services/geminiGrader';
 import { ApiSettings } from '../types';
 
 interface DeployApiViewProps {
@@ -33,7 +33,7 @@ export const DeployApiView: React.FC<DeployApiViewProps> = ({
 
   const handleTestKey = async (id: string, key: string) => {
     setTestingId(id);
-    const model = apiSettings.customModel.trim() || apiSettings.preferredModel || 'gemini-2.5-flash';
+    const model = apiSettings.customModel.trim() || apiSettings.preferredModel || DEFAULT_MODEL;
     const res = await testGeminiKey(key, model);
     setTestMessages((prev) => ({ ...prev, [id]: { ok: res.ok, msg: res.message } }));
     const next = {
@@ -130,7 +130,7 @@ export const DeployApiView: React.FC<DeployApiViewProps> = ({
             <input
               value={apiSettings.customModel}
               onChange={(e) => onUpdateApiSettings({ ...apiSettings, customModel: e.target.value })}
-              placeholder="Ví dụ: gemini-2.5-flash"
+              placeholder="Ví dụ: gemini-4-hydrogen hoặc gemini-3.8-flash"
               className="w-full px-3 py-2 text-xs border border-[#dcdcd4] dark:border-[#2a3140] rounded-lg font-mono bg-[#fafaf8] dark:bg-[#171b24] text-[#14171a] dark:text-slate-100"
             />
           </div>
@@ -138,7 +138,7 @@ export const DeployApiView: React.FC<DeployApiViewProps> = ({
 
         <div className="text-xs text-[#475569] dark:text-slate-300 bg-[#f4f4f0] dark:bg-[#171b24] p-3 rounded-lg leading-relaxed">
           <span className="font-semibold text-[#14171a] dark:text-white">Lưu ý kỹ thuật:</span> Endpoint công khai của Google Gemini sử dụng tên model chính thức như{' '}
-          <code>gemini-2.5-flash</code>, <code>gemini-2.5-pro</code>, <code>gemini-2.0-flash</code>. Key dạng <code>AIza...</code> là Google AI Studio API key chuẩn (được ưu tiên gọi trước), key thứ 2 làm dự phòng xoay vòng, và nếu hết token hệ thống tự chuyển sang Chấm Offline Rubric để bạn không bao giờ bị gián đoạn.
+          <code>gemini-4-hydrogen</code>, <code>gemini-4-argon</code>, <code>gemini-3.8-flash</code>, <code>gemini-3.5-flash-lite</code>. Key dạng <code>AIza...</code> là Google AI Studio API key chuẩn (được ưu tiên gọi trước), key thứ 2 làm dự phòng xoay vòng, và nếu hết token hệ thống tự chuyển sang Chấm Offline Rubric để bạn không bao giờ bị gián đoạn.
         </div>
 
         {/* Key List */}

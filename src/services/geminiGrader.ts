@@ -3,11 +3,13 @@ import { gradeCodeOffline, gradeEssayOffline } from './offlineGrader';
 
 const STORAGE_KEY = 'uet_dsa_api_settings_v1';
 
+export const DEFAULT_MODEL = 'gemini-4-hydrogen';
+
 export const AVAILABLE_MODELS = [
-  { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (Nhanh, ổn định, khuyên dùng)' },
-  { id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro (Chấm tự luận & thuật toán sâu)' },
-  { id: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash (Dự phòng tốc độ cao)' },
-  { id: 'gemini-2.0-flash-lite', label: 'Gemini 2.0 Flash Lite (Tiết kiệm quota)' },
+  { id: 'gemini-4-hydrogen', label: 'Gemini 4 Hydrogen (Thế hệ 4 — Nhanh, chuẩn code, khuyên dùng)' },
+  { id: 'gemini-4-argon', label: 'Gemini 4 Argon (Thế hệ 4 — Suy luận sâu bài tự luận khó)' },
+  { id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash (Cân bằng tốc độ & độ chính xác cao)' },
+  { id: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash-Lite (Nhẹ, tiết kiệm quota tối đa)' },
 ];
 
 export function getDefaultApiSettings(): ApiSettings {
@@ -36,7 +38,7 @@ export function getDefaultApiSettings(): ApiSettings {
 
   return {
     keys: defaultKeys,
-    preferredModel: 'gemini-2.5-flash',
+    preferredModel: DEFAULT_MODEL,
     customModel: '',
   };
 }
@@ -54,9 +56,11 @@ export function loadApiSettings(): ApiSettings {
         mergedKeys.push(dk);
       }
     }
+    // Upgrade legacy/deprecated gemini-2.* selections to current Generation 4 default
+    const isValidPreset = AVAILABLE_MODELS.some((m) => m.id === parsed.preferredModel);
     return {
       keys: mergedKeys,
-      preferredModel: parsed.preferredModel || defaults.preferredModel,
+      preferredModel: isValidPreset ? parsed.preferredModel : defaults.preferredModel,
       customModel: parsed.customModel || '',
     };
   } catch {
@@ -98,9 +102,9 @@ async function callGeminiWithRotation(
     return aStd - bStd;
   });
 
-  const primaryModel = settings.customModel.trim() || settings.preferredModel || 'gemini-2.5-flash';
+  const primaryModel = settings.customModel.trim() || settings.preferredModel || DEFAULT_MODEL;
   const modelCandidates = Array.from(
-    new Set([primaryModel, 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'])
+    new Set([primaryModel, 'gemini-4-hydrogen', 'gemini-3.8-flash', 'gemini-3.5-flash-lite'])
   );
 
   let lastErr = 'Không thể kết nối Gemini API';
