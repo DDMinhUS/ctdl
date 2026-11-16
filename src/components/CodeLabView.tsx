@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertTriangle,
@@ -16,6 +16,7 @@ import { ALGORITHMS } from '../data/algorithms';
 import { gradeJavaCodeWithAI } from '../services/geminiGrader';
 import { gradeCodeOffline } from '../services/offlineGrader';
 import { ApiSettings, GradeResult } from '../types';
+import { JavaCodeBlock, renderTokenizedLine, tokenizeJavaLines } from '../utils/javaHighlight';
 
 interface CodeLabViewProps {
   selectedAlgoId: string;
@@ -105,6 +106,9 @@ export const CodeLabView: React.FC<CodeLabViewProps> = ({
 
   const lineCount = currentCode.split('\n').length;
   const activeRange = algo.lineExplanations[activeLineIdx]?.lineRange || '';
+  const backdropRef = useRef<HTMLPreElement>(null);
+  const tokenizedEditor = useMemo(() => tokenizeJavaLines(currentCode), [currentCode]);
+  const tokenizedModel = useMemo(() => tokenizeJavaLines(algo.modelCode), [algo.modelCode]);
 
   return (
     <div className="space-y-5">
@@ -254,20 +258,39 @@ export const CodeLabView: React.FC<CodeLabViewProps> = ({
               </span>
               <span>{lineCount} dòng</span>
             </div>
-            <div className="flex font-mono text-[13px] leading-6">
-              <div className="select-none py-3 px-3 text-right text-slate-500 bg-[#12151b] border-r border-[#222836] min-w-[44px]">
+            <div className="max-h-[540px] overflow-y-auto flex font-mono text-[13px] leading-6">
+              <div className="select-none pt-3 pb-4 px-3 text-right text-slate-500 bg-[#12151b] border-r border-[#222836] min-w-[44px] shrink-0">
                 {Array.from({ length: lineCount }, (_, i) => (
                   <div key={i}>{i + 1}</div>
                 ))}
               </div>
-              <textarea
-                value={currentCode}
-                onChange={(e) => setCode(e.target.value)}
-                onKeyDown={handleKeyDown}
-                spellCheck={false}
-                rows={Math.min(26, Math.max(14, lineCount + 1))}
-                className="code-editor flex-1 p-3 bg-transparent text-slate-100 focus:outline-none resize-y overflow-x-auto whitespace-pre"
-              />
+              <div className="relative flex-1 min-w-0 grid min-h-[360px]">
+                <pre
+                  ref={backdropRef}
+                  aria-hidden="true"
+                  className="code-editor col-start-1 row-start-1 pt-3 pb-4 px-3 m-0 pointer-events-none select-none overflow-x-hidden whitespace-pre text-[13px] leading-6"
+                >
+                  {tokenizedEditor.map((lineTokens, i) => (
+                    <div key={i}>{lineTokens.length > 0 ? renderTokenizedLine(lineTokens) : ' '}</div>
+                  ))}
+                </pre>
+                <textarea
+                  value={currentCode}
+                  onChange={(e) => setCode(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onScroll={(e) => {
+                    if (backdropRef.current) {
+                      backdropRef.current.scrollLeft = e.currentTarget.scrollLeft;
+                    }
+                  }}
+                  wrap="off"
+                  spellCheck={false}
+                  autoCapitalize="off"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  className="code-editor code-overlay col-start-1 row-start-1 w-full h-full min-w-0 pt-3 pb-4 px-3 m-0 bg-transparent caret-sky-400 focus:outline-none resize-none overflow-x-auto overflow-y-hidden whitespace-pre text-[13px] leading-6"
+                />
+              </div>
             </div>
 
             <div className="px-4 py-3 bg-[#101318] border-t border-[#242a37] flex flex-wrap items-center justify-between gap-3">
@@ -374,9 +397,10 @@ export const CodeLabView: React.FC<CodeLabViewProps> = ({
                     <div className="text-xs font-semibold text-[#475569] dark:text-slate-300 mb-1.5">
                       Đoạn code sửa chuẩn:
                     </div>
-                    <pre className="p-3 bg-[#161920] text-slate-100 rounded-lg text-xs overflow-x-auto border border-[#2a3140]">
-                      {gradeResult.improvedSnippet}
-                    </pre>
+                    <JavaCodeBlock
+                      code={gradeResult.improvedSnippet}
+                      className="p-3 bg-[#161920] rounded-lg text-xs leading-5 overflow-x-auto border border-[#2a3140]"
+                    />
                   </div>
                 )}
               </motion.div>
@@ -410,20 +434,22 @@ export const CodeLabView: React.FC<CodeLabViewProps> = ({
 
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                   <div className="p-3 bg-[#161920] border border-[#2a3140] text-slate-100 rounded-lg text-xs leading-6 overflow-x-auto font-mono">
-                    {algo.modelCode.split('\n').map((line, i) => {
+                    {tokenizedModel.map((lineTokens, i) => {
                       const lineNum = i + 1;
                       const highlighted = activeRange && isLineInRange(lineNum, activeRange);
                       return (
                         <div
                           key={lineNum}
                           className={`px-2 rounded transition-colors ${
-                            highlighted ? 'bg-blue-500/20 text-white border-l-2 border-blue-400' : 'text-slate-300'
+                            highlighted ? 'bg-blue-500/20 border-l-2 border-blue-400' : ''
                           }`}
                         >
                           <span className="inline-block w-7 select-none text-slate-500">
                             {String(lineNum).padStart(2, ' ')}
                           </span>
-                          <span className="whitespace-pre">{line || ' '}</span>
+                          <span className="whitespace-pre">
+                            {lineTokens.length > 0 ? renderTokenizedLine(lineTokens) : ' '}
+                          </span>
                         </div>
                       );
                     })}

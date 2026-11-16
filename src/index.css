@@ -18,6 +18,18 @@
 
   code, pre, textarea.code-editor {
     font-family: var(--font-mono);
+    tab-size: 4;
+  }
+
+  textarea.code-overlay {
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  textarea.code-overlay::selection {
+    background: rgba(59, 130, 246, 0.35);
+    color: transparent;
+    -webkit-text-fill-color: transparent;
   }
 }
 

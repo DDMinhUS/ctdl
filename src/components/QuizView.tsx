@@ -15,6 +15,7 @@ import { ESSAY_QUESTIONS, MCQ_QUESTIONS } from '../data/quizzes';
 import { gradeEssayWithAI } from '../services/geminiGrader';
 import { gradeEssayOffline } from '../services/offlineGrader';
 import { ApiSettings, GradeResult } from '../types';
+import { JavaCodeBlock } from '../utils/javaHighlight';
 
 interface QuizViewProps {
   apiSettings: ApiSettings;
@@ -194,9 +195,10 @@ export const QuizView: React.FC<QuizViewProps> = ({
                 </div>
 
                 {essay.codeSnippet && (
-                  <pre className="p-3.5 bg-[#161920] border border-[#2a3140] text-slate-100 rounded-lg text-xs leading-5 overflow-x-auto">
-                    {essay.codeSnippet}
-                  </pre>
+                  <JavaCodeBlock
+                    code={essay.codeSnippet}
+                    className="p-3.5 bg-[#161920] border border-[#2a3140] rounded-lg text-xs leading-5 overflow-x-auto"
+                  />
                 )}
 
                 <div className="flex flex-wrap gap-2">
