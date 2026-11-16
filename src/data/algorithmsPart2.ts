@@ -155,9 +155,9 @@ export const ALGORITHMS_PART_2: AlgorithmItem[] = [
     priority: 'Trọng tâm',
     timeComplexity: 'Best: O(N) (~3N) | Avg/Worst: <= 2N lg N compares (Xây heap <= 2N)',
     spaceComplexity: 'O(1) in-place | Unstable',
-    summary: 'Pha 1: Duyệt k từ N/2 về 1 gọi `sink` để biến mảng thành Max-Heap trong O(N). Pha 2: Đổi `a[1]` với `a[N--]` và `sink(a, 1, N)` lặp lại đến N = 1.',
+    summary: 'Pha 1: Duyệt k từ N/2 về 1 gọi `sink` để biến mảng thành Max-Heap trong O(N). Pha 2: Đổi `pq[1]` với `pq[N--]` và `sink(pq, 1, N)` (quy ước 1-based) lặp lại đến N = 1.',
     paperTips: [
-      'Vì đề hay dùng mảng 0-based `a[0..N-1]` để sort, `algs4` viết `less(a, i, j)` trừ đi 1 (`a[i-1].compareTo(a[j-1]) < 0`) hoặc dùng quy ước 1-based khi mô phỏng giấy.',
+      'Vì đề hay dùng mảng 0-based `pq[0..N-1]` để sort, `algs4` viết `less(pq, i, j)` trừ đi 1 (`pq[i-1].compareTo(pq[j-1]) < 0`) hoặc dùng quy ước 1-based khi mô phỏng giấy.',
       'Nhớ công thức: Xây heap bottom-up chỉ tốn O(N) (tối đa 2N phép so sánh), KHÔNG phải O(N lg N)!',
     ],
     javaIdioms: [

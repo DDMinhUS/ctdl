@@ -103,7 +103,7 @@ export const ALGORITHMS_PART_1: AlgorithmItem[] = [
       'Trong code chuẩn bên dưới đã bật sẵn Path Compression kiểu Path Halving (`id[i] = id[id[i]];` trong `root(i)` — 1 dòng duy nhất) giúp tốc độ thực tế gần như O(1)!',
     ],
     javaIdioms: [
-      { token: 'while (i != id[i]) i = id[i];', meaning: 'Vòng lặp leo ngược lên nút cha cho tới khi gặp gốc (nút có cha là chính nó).' },
+      { token: 'while (i != id[i]) { id[i] = id[id[i]]; i = id[i]; }', meaning: 'Leo ngược lên gốc kết hợp Path Halving (nén nửa đường đi); bỏ dòng `id[i] = id[id[i]]` sẽ thành WeightedQuickUnion thuần.' },
       { token: 'sz[i] += sz[j];', meaning: 'Cộng dồn kích thước cây nhỏ vào cây lớn.' },
     ],
     starterCode: `public class WeightedQuickUnionUF {
