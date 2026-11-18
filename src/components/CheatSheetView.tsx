@@ -47,6 +47,11 @@ export const CheatSheetView: React.FC<CheatSheetViewProps> = ({ midtermOnly = fa
     );
   });
 
+  const displayedPlaybook = React.useMemo(() => {
+    if (!midtermOnly) return EXAM_PLAYBOOK;
+    return EXAM_PLAYBOOK.filter((p) => p.id !== 'pat-5');
+  }, [midtermOnly]);
+
   return (
     <div className="space-y-6">
       <div>
@@ -65,13 +70,18 @@ export const CheatSheetView: React.FC<CheatSheetViewProps> = ({ midtermOnly = fa
       <div className="bg-white dark:bg-[#13161d] border border-[#e3e3dc] dark:border-[#222834] rounded-xl p-5 space-y-4">
         <div className="flex items-center gap-2 border-b border-[#ecece6] dark:border-[#222834] pb-3">
           <BookMarked className="w-4 h-4 text-[#1d4ed8] dark:text-blue-400" />
-          <h2 className="text-base font-semibold text-[#14171a] dark:text-white">
-            5 Dạng bài chắc chắn gặp từ folder "Bài tập mẫu" &amp; Đề UET
+          <h2 className="text-base font-semibold text-[#14171a] dark:text-white flex items-center gap-2">
+            <span>{displayedPlaybook.length} Dạng bài chắc chắn gặp từ folder "Bài tập mẫu" &amp; Đề UET</span>
+            {midtermOnly && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500 dark:text-amber-300 font-bold border border-amber-500/30">
+                🔥 Giữa kỳ
+              </span>
+            )}
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {EXAM_PLAYBOOK.map((pat) => (
+          {displayedPlaybook.map((pat) => (
             <motion.div
               key={pat.id}
               whileHover={{ y: -2 }}

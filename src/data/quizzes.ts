@@ -346,6 +346,76 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     explanation: 'Weighted Quick-Union kết hợp Path Compression (thêm đúng 1 dòng `id[i] = id[id[i]];` trong hàm root) đạt độ phức tạp O(N + M * α(N)) với M thao tác trên N phần tử. Hàm Ackerman nghịch đảo α(N) <= 5 với mọi N trong vũ trụ, tức gần như là hằng số O(1)!',
     trapNote: 'Quick-Find có union O(N) quá chậm; Quick-Union có thể suy biến cây cao O(N).',
   },
+  {
+    id: 'mcq-mountain-array-sort',
+    topic: 'Thuật toán sắp xếp mảng núi (Bitonic Sort)',
+    source: 'COS226 Midterm f24, 8 & UET',
+    type: 'tf',
+    isMidterm: true,
+    question: 'Đúng hay Sai: Cho mảng dạng núi (Mountain array) cỡ 2n, trong đó n phần tử đầu tăng dần và n phần tử sau giảm dần. Có thể sắp xếp mảng này tăng dần trong thời gian O(n) ở trường hợp xấu nhất.',
+    options: ['Đúng', 'Sai'],
+    correctIndex: 0,
+    explanation: 'ĐÚNG! Nửa đầu đã tăng dần, nửa sau giảm dần. Ta chỉ cần dùng 2 con trỏ: con trỏ i = 0 chạy từ đầu mảng sang phải, con trỏ j = 2n - 1 chạy từ cuối mảng lùi về trái. So sánh a[i] và a[j], đưa phần tử nhỏ hơn vào mảng phụ aux[] tương tự như bước trộn merge() của Mergesort! Mỗi bước so sánh đưa được 1 phần tử về đúng vị trí, tổng cộng tốn đúng 2n bước = O(n) thời gian và O(n) bộ nhớ phụ!',
+    trapNote: 'Không cần gọi Mergesort hay Quicksort tốn O(n log n), chỉ cần 1 bước trộn 2 con trỏ O(n)!',
+  },
+  {
+    id: 'mcq-bst-to-heap-linear',
+    topic: 'Chuyển đổi BST sang Max-Heap',
+    source: 'COS226 Midterm s25, 5d & UET',
+    type: 'tf',
+    isMidterm: true,
+    question: 'Đúng hay Sai: Cho một cây tìm kiếm nhị phân (BST) gồm n khóa phân biệt. Có thể tạo một Max-Heap chứa n khóa đó chỉ với O(n) phép so sánh trong trường hợp xấu nhất.',
+    options: ['Đúng', 'Sai'],
+    correctIndex: 0,
+    explanation: 'ĐÚNG! Bước 1: Duyệt cây BST theo thứ tự In-Order (trung thứ tự) để đưa n phần tử vào một mảng đã sắp xếp. Phép duyệt này KHÔNG TỐN PHÉP SO SÁNH NÀO (0 phép so sánh)!\nBước 2: Sử dụng thuật toán xây dựng Heap Bottom-up (gọi sink từ n/2 về 1). Thuật toán này chỉ tốn tối đa 2n phép so sánh!\nTổng cộng <= 2n phép so sánh = O(n)!',
+    trapNote: 'Nếu chèn từng phần tử vào Heap rỗng thì tốn n log n, nhưng dùng In-Order + Bottom-up sink chỉ tốn O(n)!',
+  },
+  {
+    id: 'mcq-bisection-orange-black',
+    topic: 'Tìm kiếm nhị phân phân đôi (Bisection)',
+    source: 'COS226 Midterm s25, 7',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Cho mảng a[] gồm n phần tử chỉ có màu Cam hoặc Đen, trong đó a[0] màu Cam và a[n-1] màu Đen. Để tìm một chỉ số i sao cho a[i] màu Cam và a[i+1] màu Đen, số phép kiểm tra màu ít nhất trong trường hợp xấu nhất là:',
+    options: ['O(log n) bằng Tìm kiếm nhị phân phân đôi (Bisection)', 'O(n) vì phải quét tuyến tính', 'O(1)', 'O(n log n)'],
+    correctIndex: 0,
+    explanation: 'Bài toán tương tự định lý giá trị trung gian Bolzano: Tại mid = n/2, nếu a[mid] màu Cam, thì đoạn [mid .. n-1] bắt đầu bằng Cam và kết thúc bằng Đen, chắc chắn chứa ít nhất một điểm chuyển tiếp! Nếu a[mid] màu Đen, thì đoạn [0 .. mid] bắt đầu bằng Cam và kết thúc bằng Đen, chắc chắn chứa điểm chuyển tiếp! Mỗi bước chia đôi không gian tìm kiếm -> O(log n)!',
+    trapNote: 'Áp dụng nguyên lý Tìm kiếm nhị phân (Binary Search) trên hàm đơn điệu hoặc tính chất đổi dấu/đổi màu.',
+  },
+  {
+    id: 'mcq-infix-to-postfix-rule',
+    topic: 'Ngăn xếp / Chuyển biểu thức Trung tố sang Hậu tố',
+    source: 'Đề thi giữa kỳ UET',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Biểu thức trung tố (Infix) `A + B * C - D` khi chuyển sang biểu thức hậu tố (Postfix / RPN) bằng Stack sẽ có dạng nào?',
+    options: [
+      'A B C * + D -',
+      'A B + C * D -',
+      '+ A * B C - D',
+      'A B C D * + -',
+    ],
+    correctIndex: 0,
+    explanation: 'Theo thứ tự độ ưu tiên toán tử:\n1. B * C tính trước -> thành B C *\n2. A + (B * C) tính tiếp -> thành A B C * +\n3. (A + B * C) - D tính cuối cùng -> thành A B C * + D -.',
+    trapNote: 'Toán tử có độ ưu tiên cao hơn (*) được pop ra trước toán tử có độ ưu tiên thấp hơn (+, -).',
+  },
+  {
+    id: 'mcq-tree-recon-pre-in',
+    topic: 'Dựng cây nhị phân từ Preorder & Inorder',
+    source: 'Đề thi giữa kỳ UET & algs4',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Cho kết quả duyệt Tiền thứ tự (Preorder): `[A, B, D, E, C, F]` và Trung thứ tự (Inorder): `[D, B, E, A, F, C]`. Nút gốc (root) của cây và con trái của gốc lần lượt là:',
+    options: [
+      'Nút gốc là A, con trái của gốc là B',
+      'Nút gốc là D, con trái của gốc là B',
+      'Nút gốc là A, con trái của gốc là D',
+      'Nút gốc là F, con trái của gốc là C',
+    ],
+    correctIndex: 0,
+    explanation: '1. Trong Preorder (Root -> Left -> Right), phần tử đầu tiên LUÔN LÀ GỐC -> Nút gốc là A.\n2. Tìm A trong Inorder: `[D, B, E, A, F, C]` -> Toàn bộ mảng bên trái `[D, B, E]` thuộc cây con trái; `[F, C]` thuộc cây con phải.\n3. Phần tử đầu tiên của nhánh trái trong Preorder là B -> Con trái của A chính là B!',
+    trapNote: 'Preorder cho biết Gốc; Inorder cho biết ranh giới cây con trái và cây con phải.',
+  },
 
   // =========================================================================
   // CHỦ ĐỀ CUỐI KỲ: BẢNG BĂM & ĐỒ THỊ (FINAL EXAM ONLY)
@@ -624,6 +694,120 @@ Hoạt động:
 
 Cả bộ nhớ lẫn thời gian worst-case đều đạt O(n) và O(log n).`,
     keyPoints: ['red-black|cân bằng|bst|treemap', 'timestamp|2 cây', 'o(log n)', 'delete'],
+  },
+
+  // =========================================================================
+  // BÀI TỰ LUẬN GIỮA KỲ 6: THIẾT KẾ THUẬT TOÁN SẮP XẾP MẢNG NÚI (MOUNTAIN SORT)
+  // =========================================================================
+  {
+    id: 'essay-mountain-sort',
+    topic: 'Thuật toán sắp xếp mảng dạng núi (COS226 Midterm)',
+    source: 'COS226 Midterm f24, 8 — Mountain Array Sort',
+    maxScore: 2.0,
+    estimatedMinutes: 8,
+    isMidterm: true,
+    prompt: `Mảng dạng núi (Mountain array) là mảng độ dài 2n, trong đó n phần tử đầu được sắp xếp tăng dần và n phần tử sau được sắp xếp giảm dần.
+Ví dụ n = 6: a = [4, 7, 8, 11, 18, 20  |  31, 7, 7, 4, 2, 1].
+Hãy thiết kế thuật toán sắp xếp mảng trên tăng dần trong thời gian O(n) và bộ nhớ phụ O(n). Trình bày ý tưởng, mã giả/Java và phân tích độ phức tạp.`,
+    hints: [
+      'Nửa đầu đã tăng dần [0..n-1]. Nửa sau [n..2n-1] đang giảm dần -> nếu đọc từ cuối (2n-1) lùi về n thì nó cũng là dãy tăng dần!',
+      'Dùng 2 con trỏ: i = 0 (quét tiến từ đầu) và j = 2n - 1 (quét lùi từ cuối). So sánh a[i] và a[j] rồi đưa vào mảng kết quả giống hàm merge()!',
+    ],
+    rubricCriteria: [
+      'Nhận xét được tính chất: nửa đầu tăng dần, nửa sau duyệt ngược từ 2n-1 về n cũng là dãy tăng dần.',
+      'Sử dụng thuật toán trộn 2 con trỏ (Two-pointer Merge) tương tự như Mergesort: con trỏ i = 0..n-1 và j = 2n-1..n.',
+      'Mỗi bước: so sánh a[i] và a[j], đưa phần tử nhỏ hơn vào aux[k++] và dịch con trỏ tương ứng.',
+      'Độ phức tạp thời gian: Đúng 2n lần so sánh/gán -> O(n) tuyến tính.',
+      'Độ phức tạp không gian: Mảng phụ aux[] kích thước 2n -> O(n).',
+    ],
+    modelAnswer: `1. Ý tưởng thuật toán:
+- Mảng dạng núi gồm:
+  + Nửa đầu a[0..n-1] đã được sắp xếp tăng dần.
+  + Nửa sau a[n..2n-1] được sắp xếp giảm dần. Nếu ta duyệt nửa sau theo chiều ngược lại từ j = 2n - 1 lùi dần về n, các phần tử sẽ có thứ tự TĂNG DẦN!
+- Do đó, bài toán quy về việc TRỘN (Merge) hai mảng con đã tăng dần thành một mảng kết quả tăng dần duy nhất. Ta sử dụng kỹ thuật 2 con trỏ (Two Pointers) tương tự như hàm merge() của Mergesort.
+
+2. Cài đặt thuật toán bằng Java:
+public static int[] sortMountainArray(int[] a, int n) {
+    int[] aux = new int[2 * n];
+    int i = 0;          // Con trỏ chạy từ đầu nửa trái (tăng dần)
+    int j = 2 * n - 1;  // Con trỏ chạy từ cuối nửa phải (tăng dần)
+    int k = 0;          // Con trỏ ghi vào mảng kết quả aux
+
+    while (k < 2 * n) {
+        if (i >= n)             aux[k++] = a[j--]; // Nửa trái đã hết
+        else if (j < n)         aux[k++] = a[i++]; // Nửa phải đã hết
+        else if (a[i] <= a[j])  aux[k++] = a[i++];
+        else                    aux[k++] = a[j--];
+    }
+    return aux;
+}
+
+3. Phân tích độ phức tạp:
+- Thời gian: Vòng lặp while chạy đúng 2n lần, mỗi bước chỉ thực hiện 1 phép so sánh và 1 phép gán hằng số O(1) -> Tổng thời gian O(n) tuyến tính ở trường hợp xấu nhất!
+- Không gian (Bộ nhớ phụ): Sử dụng mảng phụ aux[] kích thước 2n -> O(n) bộ nhớ.`,
+    keyPoints: ['2 con trỏ|two-pointer', 'trộn|merge', 'o(n)|tuyến tính', 'aux', 'j--'],
+  },
+
+  // =========================================================================
+  // BÀI TỰ LUẬN GIỮA KỲ 7: DỰNG CÂY NHỊ PHÂN TỪ PREORDER & INORDER
+  // =========================================================================
+  {
+    id: 'essay-tree-reconstruction',
+    topic: 'Cây nhị phân / Khôi phục cây từ Preorder & Inorder',
+    source: 'Đề thi giữa kỳ UET truyền thống & algs4',
+    maxScore: 2.0,
+    estimatedMinutes: 8,
+    isMidterm: true,
+    prompt: `Cho kết quả duyệt của một Cây nhị phân gồm các ký tự phân biệt:
+- Duyệt Tiền thứ tự (Preorder):  A  B  D  E  C  F  G
+- Duyệt Trung thứ tự (Inorder):   D  B  E  A  F  C  G
+Hãy:
+a. Nêu nguyên lý xác định nút gốc, cây con trái và cây con phải từ 2 chuỗi trên.
+b. Dựng lại cấu trúc cây nhị phân ban đầu (vẽ hoặc mô tả đầy đủ các nút và liên kết cha-con).
+c. Cho biết kết quả duyệt Hậu thứ tự (Postorder) của cây vừa dựng.`,
+    hints: [
+      'Preorder có thứ tự: Gốc -> Trái -> Phải. Phần tử đầu tiên của Preorder luôn là Gốc!',
+      'Tìm vị trí phần tử Gốc trong Inorder: toàn bộ các phần tử bên trái gốc thuộc Cây con trái; các phần tử bên phải gốc thuộc Cây con phải!',
+      'Postorder có thứ tự: Trái -> Phải -> Gốc.',
+    ],
+    rubricCriteria: [
+      'Phần a: Giải thích đúng nguyên lý: Preorder lấy phần tử đầu làm Root; Inorder tìm Root để chia đôi không gian thành Cây con trái và Cây con phải.',
+      'Phần b: Dựng đúng cấu trúc cây: Gốc A; Con trái là B (B có con trái D, con phải E); Con phải là C (C có con trái F, con phải G).',
+      'Phần c: Đưa ra đúng chuỗi duyệt Postorder: D  E  B  F  G  C  A.',
+    ],
+    modelAnswer: `a. Nguyên lý đệ quy khôi phục cây:
+- Tiền thứ tự (Preorder = Root -> Left -> Right): Phần tử đầu tiên luôn luôn là NÚT GỐC (Root) của cây/cây con hiện tại.
+- Trung thứ tự (Inorder = Left -> Root -> Right): Tìm vị trí của nút gốc vừa xác định trong chuỗi Inorder. Nút gốc sẽ chia Inorder thành hai phần riêng biệt:
+  + Tất cả các phần tử nằm bên TRÁI nút gốc thuộc về CÂY CON TRÁI.
+  + Tất cả các phần tử nằm bên PHẢI nút gốc thuộc về CÂY CON PHẢI.
+- Đếm số lượng phần tử của cây con trái (k phần tử). Khi đó trong Preorder, k phần tử kế tiếp sau gốc sẽ thuộc cây con trái, và các phần tử còn lại thuộc cây con phải.
+- Lặp lại quy trình đệ quy cho cây con trái và cây con phải.
+
+b. Các bước dựng cây chi tiết:
+1. Gốc toàn cây là A (phần tử đầu của Preorder).
+2. Tìm A trong Inorder: [D, B, E] | A | [F, C, G].
+   - Cây con trái gồm {D, B, E} (3 phần tử).
+   - Cây con phải gồm {F, C, G} (3 phần tử).
+3. Xét Cây con trái:
+   - Trong Preorder, 3 phần tử tiếp theo là [B, D, E] -> Gốc cây con trái là B.
+   - Trong Inorder [D, B, E]: D nằm bên trái B -> D là con trái của B; E nằm bên phải B -> E là con phải của B.
+4. Xét Cây con phải:
+   - Trong Preorder, 3 phần tử còn lại là [C, F, G] -> Gốc cây con phải là C.
+   - Trong Inorder [F, C, G]: F nằm bên trái C -> F là con trái của C; G nằm bên phải C -> G là con phải của C.
+
+Cấu trúc Cây nhị phân hoàn chỉnh:
+         A
+       /   \\
+      B     C
+     / \\   / \\
+    D   E F   G
+
+c. Kết quả duyệt Hậu thứ tự (Postorder = Left -> Right -> Root):
+- Nhánh trái: D -> E -> B
+- Nhánh phải: F -> G -> C
+- Gốc: A
+=> Chuỗi Postorder: D  E  B  F  G  C  A.`,
+    keyPoints: ['preorder|tiền thứ tự', 'inorder|trung thứ tự', 'gốc a', 'postorder', 'd e b f g c a'],
   },
 
   // =========================================================================
