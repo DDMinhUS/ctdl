@@ -468,6 +468,7 @@ export const ALGORITHMS_PART_2: AlgorithmItem[] = [
     topic: 'Balanced Search Trees',
     week: 'Tuần 10',
     priority: 'Trọng tâm',
+    isMidterm: false,
     timeComplexity: 'Search/Insert: Worst <= 2 lg N (Cân bằng đen tuyệt đối)',
     spaceComplexity: 'O(N) thêm boolean color trên Node',
     summary: 'Ánh xạ 1-1 với cây 2-3: liên kết ĐỎ luôn nghiêng TRÁI, không nút nào có 2 liên kết đỏ liên tiếp. Chèn xong chạy 3 dòng chuẩn hóa từ dưới lên.',

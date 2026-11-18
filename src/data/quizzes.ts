@@ -301,7 +301,7 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     topic: 'Cây LLRB (Left-Leaning Red-Black)',
     source: 'algs4 Tuần 10',
     type: 'mcq',
-    isMidterm: true,
+    isMidterm: false,
     question: 'Phát biểu nào sau đây SAI về cây Đỏ-Đen nghiêng trái (LLRB) của GS. Sedgewick?',
     options: [
       'Được phép có liên kết đỏ nghiêng sang phải',
@@ -322,7 +322,7 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     topic: 'Union-Find',
     source: 'algs4 Tuần 1',
     type: 'mcq',
-    isMidterm: true,
+    isMidterm: false,
     question: 'Với WeightedQuickUnionUF có N = 1024 phần tử (không dùng path compression), chiều cao tối đa của một cây bất kỳ là bao nhiêu?',
     options: ['10 (tức lg N)', '512 (tức N/2)', '1024 (tức N)', '32 (tức sqrt(N))'],
     correctIndex: 0,
@@ -334,7 +334,7 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     topic: 'Union-Find / So sánh chi phí',
     source: 'Đề thi UET',
     type: 'mcq',
-    isMidterm: true,
+    isMidterm: false,
     question: 'Thuật toán Union-Find nào sau đây có chi phí khởi tạo O(N), thao tác find gần như O(1) và thao tác union gần như O(1) trên thực tế?',
     options: [
       'Weighted Quick-Union kết hợp Path Compression (Nén đường đi)',

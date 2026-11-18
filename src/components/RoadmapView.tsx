@@ -25,15 +25,44 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
 }) => {
   const displayedRoadmap = useMemo(() => {
     if (!midtermOnly) return SPRINT_ROADMAP;
-    // Keep phase-1 (Java, UF, Stack/Queue), phase-2 (Sorting, Complexity, Heap), phase-3 (BST, AVL)
-    // Filter out phase-4 (Đồ thị DFS/BFS)
     return SPRINT_ROADMAP.filter((p) => p.id !== 'phase-4').map((p) => {
+      if (p.id === 'phase-1') {
+        return {
+          ...p,
+          phase: 'Chặng 1 (45 phút đầu): Java viết giấy, Độ phức tạp & Stack/Queue',
+          goal: 'Nắm vững cú pháp Java algs4, phân tích độ phức tạp O(1)/O(log N) và cấu trúc LIFO/FIFO.',
+          tasks: p.tasks.map((t) => {
+            if (t.id === 't1-2') {
+              return {
+                id: 't1-2',
+                title: 'Thuộc BinarySearch & Phân tích Độ phức tạp',
+                detail: 'Tính mid an toàn `lo + (hi - lo) / 2`, phân tích worst-case ~ 1 + lg N so sánh và mô hình bộ nhớ 64-bit JVM.',
+                tag: 'Bắt buộc' as const,
+                linkedTab: 'codelab' as const,
+                linkedAlgoId: 'binary-search',
+              };
+            }
+            return t;
+          }),
+        };
+      }
       if (p.id === 'phase-3') {
         return {
           ...p,
-          phase: 'Chặng 3: BST & Cây Cân Bằng (AVL, LLRB)',
+          phase: 'Chặng 3: BST & Cây Cân Bằng AVL',
           goal: 'Nắm chắc cây BST, xóa Hibbard và 4 phép xoay cân bằng cây AVL (LL, RR, LR, RL).',
-          tasks: p.tasks.filter((t) => !t.title.toLowerCase().includes('băm')),
+          tasks: p.tasks
+            .filter((t) => !t.title.toLowerCase().includes('băm') && !t.title.toLowerCase().includes('llrb'))
+            .map((t) => {
+              if (t.id === 't3-2') {
+                return {
+                  ...t,
+                  title: 'Thành thạo 4 phép xoay AVL (LL, RR, LR, RL)',
+                  detail: 'Thử chạy dãy 80 20 40 30 10 100 70 90 50 trên AVL để thấy từng bước xoay kép LR!',
+                };
+              }
+              return t;
+            }),
         };
       }
       return p;

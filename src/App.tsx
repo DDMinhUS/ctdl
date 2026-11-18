@@ -63,7 +63,29 @@ function loadProgress(): SavedProgress {
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabId>('roadmap');
-  const [selectedAlgoId, setSelectedAlgoId] = useState<string>(ALGORITHMS[0].id);
+  const [midtermOnly, setMidtermOnly] = useState<boolean>(() => {
+    try {
+      const val = localStorage.getItem(STORAGE_MIDTERM);
+      return val === null ? true : val === 'true';
+    } catch {
+      return true;
+    }
+  });
+  const [selectedAlgoId, setSelectedAlgoId] = useState<string>(() => {
+    const isMidtermStored = (() => {
+      try {
+        const val = localStorage.getItem(STORAGE_MIDTERM);
+        return val === null ? true : val === 'true';
+      } catch {
+        return true;
+      }
+    })();
+    if (isMidtermStored) {
+      const firstMid = ALGORITHMS.find((a) => a.isMidterm !== false);
+      if (firstMid) return firstMid.id;
+    }
+    return ALGORITHMS[0].id;
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>(() =>
     typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
@@ -74,18 +96,17 @@ export const App: React.FC = () => {
   const [apiSettings, setApiSettings] = useState<ApiSettings>(() => loadApiSettings());
   const [progress, setProgress] = useState<SavedProgress>(() => loadProgress());
   const [nowMs, setNowMs] = useState(() => Date.now());
-  const [midtermOnly, setMidtermOnly] = useState<boolean>(() => {
-    try {
-      const val = localStorage.getItem(STORAGE_MIDTERM);
-      return val === null ? true : val === 'true';
-    } catch {
-      return true;
-    }
-  });
 
   useEffect(() => {
     localStorage.setItem(STORAGE_MIDTERM, String(midtermOnly));
-  }, [midtermOnly]);
+    if (midtermOnly) {
+      const isCurrentMidterm = ALGORITHMS.some((a) => a.id === selectedAlgoId && a.isMidterm !== false);
+      if (!isCurrentMidterm) {
+        const firstMid = ALGORITHMS.find((a) => a.isMidterm !== false);
+        if (firstMid) setSelectedAlgoId(firstMid.id);
+      }
+    }
+  }, [midtermOnly, selectedAlgoId]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_PROGRESS, JSON.stringify(progress));

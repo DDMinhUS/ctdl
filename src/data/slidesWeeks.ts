@@ -43,6 +43,7 @@ export interface WeekSlideData {
 export const SLIDE_WEEKS_DATA: WeekSlideData[] = [
   {
     weekNumber: 1,
+    isMidterm: false,
     title: 'Bài toán Union-Find (Liên thông động)',
     subtitle: 'Dynamic Connectivity, Quick-Find, Quick-Union, Weighted Quick-Union & Path Compression',
     slideFileName: '15UnionFind.pdf',
@@ -861,6 +862,7 @@ private int hash(Key key) {
   },
   {
     weekNumber: 11,
+    isMidterm: false,
     title: 'Lý thuyết đồ thị (Graphs): DFS, BFS & Mô hình hóa',
     subtitle: 'Adjacency List, Depth-First Search, Breadth-First Search, Connected Components, Topological Sort & Đảo quốc X',
     slideFileName: 'Học liệu & Bài tập mẫu',
@@ -952,6 +954,7 @@ private int hash(Key key) {
   },
   {
     weekNumber: 12,
+    isMidterm: false,
     title: 'Mở rộng: Cây khung nhỏ nhất (MST) & Đường đi ngắn nhất (Dijkstra)',
     subtitle: 'Min Spanning Tree (Kruskal & Prim with IndexMinPQ), Dijkstra Shortest Paths & Câu 8 đề thi UET',
     slideFileName: 'Cấu trúc dữ liệu giải thuật - Bài giảng.docx',

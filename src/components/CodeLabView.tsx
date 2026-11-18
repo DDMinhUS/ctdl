@@ -51,6 +51,12 @@ export const CodeLabView: React.FC<CodeLabViewProps> = ({
     return ALGORITHMS.filter((a) => a.isMidterm !== false);
   }, [midtermOnly]);
 
+  useEffect(() => {
+    if (displayedAlgos.length > 0 && !displayedAlgos.some((a) => a.id === selectedAlgoId)) {
+      onSelectAlgo(displayedAlgos[0].id);
+    }
+  }, [displayedAlgos, selectedAlgoId, onSelectAlgo]);
+
   const algo = displayedAlgos.find((a) => a.id === selectedAlgoId) || displayedAlgos[0];
 
   const [mode, setMode] = useState<PracticeMode>('skeleton');

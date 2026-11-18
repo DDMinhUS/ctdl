@@ -7,6 +7,7 @@ export const ALGORITHMS_PART_1: AlgorithmItem[] = [
     topic: 'Union-Find',
     week: 'Tuần 1',
     priority: 'Bắt buộc',
+    isMidterm: false,
     timeComplexity: 'Init: N | Find: 1 | Union: N',
     spaceComplexity: 'O(N) mảng int[] id',
     summary: 'Mỗi phần tử lưu trực tiếp ID thành phần liên thông trong mảng id[]. Hai phần tử nối nhau khi id[p] == id[q].',
@@ -95,6 +96,7 @@ export const ALGORITHMS_PART_1: AlgorithmItem[] = [
     topic: 'Union-Find',
     week: 'Tuần 1',
     priority: 'Bắt buộc',
+    isMidterm: false,
     timeComplexity: 'Init: N | Find: <= lg N (gần O(1) amortized với Path Halving)',
     spaceComplexity: 'O(N) hai mảng id[] và sz[]',
     summary: 'Lưu rừng cây qua mảng cha id[]. Hàm root(i) leo lên gốc (có path halving); khi union luôn gắn cây nhỏ (sz nhỏ hơn) vào gốc cây lớn để giữ chiều cao <= lg N.',
@@ -210,6 +212,82 @@ export const ALGORITHMS_PART_1: AlgorithmItem[] = [
       { id: 'root', label: 'Hàm root(i) leo lên id[i]', patterns: ['while\\s*\\(\\s*i\\s*!=\\s*id\\[i\\]\\s*\\)'], points: 3, hintIfMissing: 'Viết while (i != id[i]) i = id[i];.' },
       { id: 'same-root', label: 'Kiểm tra i == j để return sớm', patterns: ['if\\s*\\(\\s*i\\s*==\\s*j\\s*\\)\\s*return'], points: 2, hintIfMissing: 'Thiếu if (i == j) return; sẽ làm sz[] bị cộng sai nếu p, q đã nối.' },
       { id: 'weight', label: 'So sánh sz[i] < sz[j] và cập nhật sz', patterns: ['sz\\[i\\]\\s*<\\s*sz\\[j\\]', 'sz\\[[ij]\\]\\s*\\+='], points: 3, hintIfMissing: 'Gắn gốc cây nhỏ vào gốc cây lớn và cộng sz.' },
+    ],
+  },
+  {
+    id: 'binary-search',
+    title: 'BinarySearch (Tìm kiếm nhị phân & Complexity)',
+    topic: 'Complexity & Phân tích thuật toán',
+    week: 'Tuần 2 · Complexity',
+    priority: 'Bắt buộc',
+    isMidterm: true,
+    timeComplexity: 'Best: O(1) | Worst / Avg: ~ 1 + lg N so sánh (O(lg N))',
+    spaceComplexity: 'O(1) bộ nhớ phụ',
+    summary: 'Thuật toán tìm kiếm kinh điển trên mảng đã sắp xếp. Mỗi lần so sánh thu hẹp một nửa khoảng tìm kiếm [lo, hi], minh họa chặt chẽ lý thuyết O(log N) và đếm số phép so sánh khóa.',
+    paperTips: [
+      'Công thức tính vị trí giữa: Dùng `int mid = lo + (hi - lo) / 2;` thay vì `(lo + hi) / 2` để tránh lỗi tràn số nguyên (integer overflow) khi lo + hi vượt quá 2^31 - 1!',
+      'Số phép so sánh khóa tối đa ở trường hợp xấu nhất là floor(lg N) + 1.',
+      'Khi không tìm thấy, hàm trả về -1 (hoặc -lo - 1 trong thư viện chuẩn Java java.util.Arrays.binarySearch).',
+    ],
+    javaIdioms: [
+      { token: 'int mid = lo + (hi - lo) / 2;', meaning: 'Tính chỉ số trung vị an toàn tuyệt đối chống tràn số nguyên.' },
+      { token: 'while (lo <= hi)', meaning: 'Điều kiện lặp: tiếp tục khi khoảng tìm kiếm còn ít nhất 1 phần tử.' },
+      { token: 'return -1;', meaning: 'Giá trị trả về quy ước khi khóa key không tồn tại trong mảng.' },
+    ],
+    starterCode: `public class BinarySearch {
+    public static int indexOf(int[] a, int key) {
+        int lo = 0;
+        int hi = a.length - 1;
+        while (lo <= hi) {
+            // Tinh mid va so sanh voi key
+        }
+        return -1;
+    }
+}`,
+    skeletonCode: `public class BinarySearch {
+    public static int indexOf(int[] a, int key) {
+        int lo = 0;
+        int hi = a.length - 1;
+        while (lo <= hi) {
+            int mid = lo + (hi - lo) / 2;
+            if (key < a[mid]) {
+                hi = ___;
+            } else if (key > a[mid]) {
+                lo = ___;
+            } else {
+                return ___;
+            }
+        }
+        return -1;
+    }
+}`,
+    modelCode: `public class BinarySearch {
+    public static int indexOf(int[] a, int key) {
+        int lo = 0;
+        int hi = a.length - 1;
+        while (lo <= hi) {
+            int mid = lo + (hi - lo) / 2;
+            if (key < a[mid]) {
+                hi = mid - 1;
+            } else if (key > a[mid]) {
+                lo = mid + 1;
+            } else {
+                return mid;
+            }
+        }
+        return -1;
+    }
+}`,
+    lineExplanations: [
+      { lineRange: '3-4', snippet: 'int lo = 0; int hi = a.length - 1;', javaSyntax: 'Khai báo hai biến chỉ số chặn hai đầu mảng.', algoRole: 'Khoảng tìm kiếm ban đầu bao trùm toàn bộ mảng [0..N-1].' },
+      { lineRange: '5', snippet: 'while (lo <= hi)', javaSyntax: 'Vòng lặp điều kiện dừng khi khoảng tìm kiếm rỗng.', algoRole: 'Nếu lo > hi nghĩa là phần tử không tồn tại trong mảng.' },
+      { lineRange: '6', snippet: 'int mid = lo + (hi - lo) / 2;', javaSyntax: 'Phép chia số nguyên tự làm tròn xuống.', algoRole: 'Chọn phần tử giữa để chia đôi không gian tìm kiếm.' },
+      { lineRange: '7-12', snippet: 'if (key < a[mid]) hi = mid - 1; else if (key > a[mid]) lo = mid + 1; else return mid;', javaSyntax: 'Cấu trúc rẽ nhánh if-else 3 chiều.', algoRole: 'Loại bỏ một nửa mảng không chứa key; trả về mid ngay khi tìm thấy.' },
+    ],
+    rubricChecks: [
+      { id: 'mid', label: 'Tính mid an toàn lo + (hi - lo) / 2', patterns: ['lo\\s*\\+\\s*\\(\\s*hi\\s*-\\s*lo\\s*\\)\\s*/\\s*2'], points: 3, hintIfMissing: 'Nên dùng mid = lo + (hi - lo) / 2 để tránh tràn số.' },
+      { id: 'bound', label: 'Cập nhật hi = mid - 1 và lo = mid + 1', patterns: ['hi\\s*=\\s*mid\\s*-\\s*1', 'lo\\s*=\\s*mid\\s*\\+\\s*1'], points: 4, hintIfMissing: 'Khi rẽ nhánh phải gán hi = mid - 1 và lo = mid + 1 để khoảng co lại.' },
+      { id: 'ret', label: 'Trả về mid khi tìm thấy và -1 khi không thấy', patterns: ['return\\s+mid', 'return\\s+-1'], points: 3, hintIfMissing: 'Trả về mid khi a[mid] == key, và return -1 sau vòng while.' },
     ],
   },
   {
@@ -427,6 +505,119 @@ export const ALGORITHMS_PART_1: AlgorithmItem[] = [
       { id: 'enq-link', label: 'Nối oldlast.next = last', patterns: ['oldlast\\.next\\s*=\\s*last'], points: 3, hintIfMissing: 'Cần nối oldlast.next = last ở nhánh else.' },
       { id: 'deq-move', label: 'Dequeue cập nhật first = first.next', patterns: ['first\\s*=\\s*first\\.next'], points: 2, hintIfMissing: 'Dời first = first.next khi lấy phần tử đầu.' },
       { id: 'deq-empty', label: 'Xử lý last = null khi rỗng sau dequeue', patterns: ['if\\s*\\(\\s*isEmpty\\s*\\(\\)\\s*\\)\\s*last\\s*=\\s*null'], points: 2, hintIfMissing: 'Nhớ gán last = null nếu queue trở nên rỗng.' },
+    ],
+  },
+  {
+    id: 'resizing-array-stack',
+    title: 'ResizingArrayStack (Ngăn xếp mảng co giãn)',
+    topic: 'Stack & Queue (Mảng động)',
+    week: 'Tuần 3 · Stack & Queue',
+    priority: 'Trọng tâm',
+    isMidterm: true,
+    timeComplexity: 'Push/Pop: Amortized O(1) | Worst: O(N) khi cấp phát lại',
+    spaceComplexity: 'Từ N đến 4N phần tử (không bao giờ lãng phí quá 3/4 mảng)',
+    summary: 'Cài đặt Stack bằng mảng động. Nhân đôi mảng khi đầy (N == a.length), thu hẹp một nửa khi vơi còn 1/4 (N == a.length / 4) để triệt tiêu hiện tượng dao động con lắc (Thrashing).',
+    paperTips: [
+      'BẪY THI GIẤY: Tại sao resize(a.length / 2) khi N == a.length / 4 mà KHÔNG PHẢI N == a.length / 2?',
+      'Trả lời: Nếu giảm nửa khi N == a.length / 2, một chuỗi xen kẽ push-pop tại ngưỡng đầy sẽ kích hoạt resize liên tục tốn O(N) mỗi lệnh (Thrashing). Giảm ở 1/4 đảm bảo mảng sau khi giảm vẫn đầy 1/2, cần ít nhất N/4 lần push hoặc pop nữa mới phải resize tiếp.',
+      'Trong pop(): nhớ gán `a[N] = null;` để tránh hiện tượng Loitering (rò rỉ tham chiếu, cản trở Garbage Collector thu hồi bộ nhớ)!',
+    ],
+    javaIdioms: [
+      { token: 'a = (Item[]) new Object[capacity];', meaning: 'Java cấm tạo new Item[capacity], phải tạo mảng Object rồi ép kiểu.' },
+      { token: 'a[N] = null;', meaning: 'Xóa bỏ tham chiếu đối tượng khỏi mảng (tránh Loitering memory leak).' },
+    ],
+    starterCode: `public class ResizingArrayStack<Item> {
+    private Item[] a = (Item[]) new Object[1];
+    private int N = 0;
+
+    public boolean isEmpty() { return N == 0; }
+    public int size() { return N; }
+
+    private void resize(int max) {
+        // Tao mang moi co kich thuoc max va copy a[] sang mang moi
+    }
+
+    public void push(Item item) {
+        // Nhan doi neu mang day
+    }
+
+    public Item pop() {
+        // Thu hep mot nua neu voi con 1/4, tranh loitering
+        return null;
+    }
+}`,
+    skeletonCode: `public class ResizingArrayStack<Item> {
+    private Item[] a = (Item[]) new Object[1];
+    private int N = 0;
+
+    public boolean isEmpty() { return N == 0; }
+    public int size() { return N; }
+
+    private void resize(int max) {
+        Item[] temp = (Item[]) new Object[max];
+        for (int i = 0; i < N; i++) {
+            temp[i] = a[i];
+        }
+        a = temp;
+    }
+
+    public void push(Item item) {
+        if (N == a.length) {
+            resize(___);
+        }
+        a[N++] = item;
+    }
+
+    public Item pop() {
+        Item item = a[--N];
+        a[N] = null; // Tranh loitering
+        if (N > 0 && N == a.length / 4) {
+            resize(___);
+        }
+        return item;
+    }
+}`,
+    modelCode: `public class ResizingArrayStack<Item> {
+    private Item[] a = (Item[]) new Object[1];
+    private int N = 0;
+
+    public boolean isEmpty() { return N == 0; }
+    public int size() { return N; }
+
+    private void resize(int max) {
+        Item[] temp = (Item[]) new Object[max];
+        for (int i = 0; i < N; i++) {
+            temp[i] = a[i];
+        }
+        a = temp;
+    }
+
+    public void push(Item item) {
+        if (N == a.length) {
+            resize(2 * a.length);
+        }
+        a[N++] = item;
+    }
+
+    public Item pop() {
+        Item item = a[--N];
+        a[N] = null; // Tranh loitering
+        if (N > 0 && N == a.length / 4) {
+            resize(a.length / 2);
+        }
+        return item;
+    }
+}`,
+    lineExplanations: [
+      { lineRange: '2', snippet: 'private Item[] a = (Item[]) new Object[1];', javaSyntax: 'Khởi tạo mảng động kích thước ban đầu = 1.', algoRole: 'Dùng Generic array qua ép kiểu Object[].' },
+      { lineRange: '8-14', snippet: 'private void resize(int max) { ... }', javaSyntax: 'Hàm private phụ trợ tạo mảng mới và sao chép phần tử.', algoRole: 'Chi phí O(N) nhưng tần suất thưa thớt, cho chi phí khấu hao amortized O(1).' },
+      { lineRange: '17-19', snippet: 'if (N == a.length) resize(2 * a.length);', javaSyntax: 'Nhân đôi kích thước mảng.', algoRole: 'Đảm bảo mảng luôn có chỗ chứa cho lần push tiếp theo.' },
+      { lineRange: '25-27', snippet: 'a[N] = null; if (N > 0 && N == a.length / 4) resize(a.length / 2);', javaSyntax: 'Gán null ngăn memory leak và kiểm tra ngưỡng 1/4.', algoRole: 'Tránh lỗi Thrashing (liên tục mở rộng rồi thu hẹp tốn O(N)).' },
+    ],
+    rubricChecks: [
+      { id: 'push-double', label: 'Push nhân đôi resize(2 * a.length) khi N == a.length', patterns: ['resize\\s*\\(\\s*2\\s*\\*\\s*a\\.length\\s*\\)'], points: 3, hintIfMissing: 'Khi N == a.length cần gọi resize(2 * a.length).' },
+      { id: 'loiter', label: 'Pop gán a[N] = null chống loitering', patterns: ['a\\[N\\]\\s*=\\s*null'], points: 3, hintIfMissing: 'Phải gán a[N] = null sau khi giảm N để Garbage Collector dọn dẹp.' },
+      { id: 'pop-quarter', label: 'Pop thu hẹp resize(a.length / 2) khi N == a.length / 4', patterns: ['a\\.length\\s*/\\s*4', 'resize\\s*\\(\\s*a\\.length\\s*/\\s*2\\s*\\)'], points: 4, hintIfMissing: 'Điều kiện thu hẹp chuẩn là N > 0 && N == a.length / 4 -> resize(a.length / 2).' },
     ],
   },
   {

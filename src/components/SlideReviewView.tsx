@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   GraduationCap,
@@ -535,8 +535,14 @@ export const SlideReviewView: React.FC<SlideReviewViewProps> = ({ onNavigate, mi
 
   const displayedWeeks = useMemo(() => {
     if (!midtermOnly) return SLIDE_WEEKS_DATA;
-    return SLIDE_WEEKS_DATA.filter((w) => w.weekNumber <= 10);
+    return SLIDE_WEEKS_DATA.filter((w) => w.isMidterm !== false);
   }, [midtermOnly]);
+
+  useEffect(() => {
+    if (displayedWeeks.length > 0 && !displayedWeeks.some((w) => w.weekNumber === selectedWeekNum)) {
+      setSelectedWeekNum(displayedWeeks[0].weekNumber);
+    }
+  }, [displayedWeeks, selectedWeekNum]);
 
   const selectedWeek = useMemo(() => {
     const found = displayedWeeks.find((w) => w.weekNumber === selectedWeekNum);
