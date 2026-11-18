@@ -834,6 +834,7 @@ export const ALGORITHMS_PART_2: AlgorithmItem[] = [
   },
   {
     id: 'hash-tables',
+    isMidterm: false,
     title: 'Hash Tables (Separate Chaining & Linear Probing)',
     topic: 'Bảng băm',
     week: 'Tuần 10',
@@ -938,6 +939,7 @@ export const ALGORITHMS_PART_2: AlgorithmItem[] = [
   },
   {
     id: 'graph-dfs-bfs',
+    isMidterm: false,
     title: 'Đồ thị vô hướng: Graph + DFS + BFS',
     topic: 'Đồ thị vô hướng',
     week: 'Tuần 11',

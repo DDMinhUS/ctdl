@@ -5,6 +5,8 @@ import {
   Code2,
   Compass,
   FileCheck2,
+  FileCode,
+  Flame,
   GraduationCap,
   Menu,
   Moon,
@@ -16,6 +18,7 @@ import {
 import { CheatSheetView } from './components/CheatSheetView';
 import { CodeLabView } from './components/CodeLabView';
 import { DeployApiView } from './components/DeployApiView';
+import { JavaW3SchoolsView } from './components/JavaW3SchoolsView';
 import { QuizView } from './components/QuizView';
 import { RoadmapView } from './components/RoadmapView';
 import { SlideReviewView } from './components/SlideReviewView';
@@ -27,6 +30,7 @@ import { ApiSettings, TabId } from './types';
 
 const STORAGE_PROGRESS = 'uet_dsa_progress_v1';
 const STORAGE_THEME = 'uet_dsa_theme_v1';
+const STORAGE_MIDTERM = 'uet_dsa_midterm_filter_v1';
 
 interface SavedProgress {
   completedTaskIds: string[];
@@ -70,6 +74,18 @@ export const App: React.FC = () => {
   const [apiSettings, setApiSettings] = useState<ApiSettings>(() => loadApiSettings());
   const [progress, setProgress] = useState<SavedProgress>(() => loadProgress());
   const [nowMs, setNowMs] = useState(() => Date.now());
+  const [midtermOnly, setMidtermOnly] = useState<boolean>(() => {
+    try {
+      const val = localStorage.getItem(STORAGE_MIDTERM);
+      return val === null ? true : val === 'true';
+    } catch {
+      return true;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_MIDTERM, String(midtermOnly));
+  }, [midtermOnly]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_PROGRESS, JSON.stringify(progress));
@@ -148,14 +164,15 @@ export const App: React.FC = () => {
 
   const navItems: Array<{ id: TabId; label: string; icon: React.ReactNode; badge?: string }> = [
     { id: 'roadmap', label: 'Lộ trình cấp tốc', icon: <Compass className="w-4 h-4" />, badge: `${roadmapPct}%` },
-    { id: 'slides', label: 'Slide bài giảng', icon: <GraduationCap className="w-4 h-4" />, badge: '11 Tuần' },
+    { id: 'slides', label: 'Slide bài giảng', icon: <GraduationCap className="w-4 h-4" />, badge: midtermOnly ? '10 Tuần' : '11 Tuần' },
     {
       id: 'codelab',
       label: 'Phòng luyện Code',
       icon: <Code2 className="w-4 h-4" />,
-      badge: `${passedAlgoCount}/${ALGORITHMS.length}`,
+      badge: `${passedAlgoCount}/${midtermOnly ? ALGORITHMS.filter((a) => a.isMidterm !== false).length : ALGORITHMS.length}`,
     },
     { id: 'quiz', label: 'Quiz & Tự luận AI', icon: <FileCheck2 className="w-4 h-4" /> },
+    { id: 'java', label: 'Cú pháp Java (W3Schools)', icon: <FileCode className="w-4 h-4" /> },
     { id: 'cheatsheet', label: 'Tổng kết & Mô phỏng', icon: <BookOpen className="w-4 h-4" /> },
     { id: 'deploy', label: 'API & Deploy Web', icon: <Rocket className="w-4 h-4" /> },
   ];
@@ -201,6 +218,31 @@ export const App: React.FC = () => {
               </motion.div>
             </AnimatePresence>
           </motion.button>
+        </div>
+
+        {/* Midterm Filter Mode Toggle Button */}
+        <div className="px-1.5">
+          <button
+            onClick={() => setMidtermOnly((m) => !m)}
+            className={`w-full py-2 px-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all border ${
+              midtermOnly
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-amber-400 shadow-sm shadow-amber-500/20'
+                : 'bg-white dark:bg-[#171b24] text-[#4b4f56] dark:text-slate-300 border-[#dcdcd4] dark:border-[#242b38] hover:border-amber-400'
+            }`}
+            title="Lọc nội dung chỉ dành riêng cho kỳ thi giữa kỳ (Complexity, Sort, Stack/Queue, Heap, BST/AVL)"
+          >
+            <div className="flex items-center gap-1.5">
+              <Flame className={`w-4 h-4 ${midtermOnly ? 'text-white' : 'text-amber-500'}`} />
+              <span>{midtermOnly ? 'Ôn Giữa Kỳ: BẬT' : 'Ôn Giữa Kỳ: TẮT'}</span>
+            </div>
+            <span
+              className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                midtermOnly ? 'bg-black/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+              }`}
+            >
+              {midtermOnly ? '5 Chủ đề' : 'Tất cả'}
+            </span>
+          </button>
         </div>
 
         {/* Navigation with sliding active pill */}
@@ -294,6 +336,17 @@ export const App: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setMidtermOnly((m) => !m)}
+              className={`p-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1 ${
+                midtermOnly
+                  ? 'bg-amber-500 text-white border-amber-400'
+                  : 'border-[#dcdcd4] dark:border-[#242b38] bg-white dark:bg-[#171b24] text-slate-600 dark:text-slate-300'
+              }`}
+              title="Bật/Tắt Ôn Giữa Kỳ"
+            >
+              <Flame className="w-4 h-4" />
+            </button>
+            <button
               onClick={toggleTheme}
               className="p-1.5 rounded-lg border border-[#dcdcd4] dark:border-[#242b38] bg-white dark:bg-[#171b24]"
             >
@@ -332,7 +385,34 @@ export const App: React.FC = () => {
         </AnimatePresence>
 
         {/* Main Content Canvas with smooth tab transitions */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1260px] w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1260px] w-full mx-auto space-y-4">
+          {/* Desktop Global Mode Ribbon */}
+          <div className="hidden sm:flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#12161f] border border-[#dcdcd4] dark:border-[#242b38] shadow-2xs">
+            <div className="flex items-center gap-2.5">
+              <span className={`w-2.5 h-2.5 rounded-full ${midtermOnly ? 'bg-amber-500 animate-ping' : 'bg-blue-500'}`} />
+              <span className="text-xs font-semibold text-[#14171a] dark:text-white">
+                {midtermOnly ? 'Chế độ Ôn Thi Giữa Kỳ đang BẬT' : 'Chế độ Toàn bộ Giáo trình (Bao gồm Cuối Kỳ)'}
+              </span>
+              <span className="text-xs text-[#646970] dark:text-slate-400">
+                {midtermOnly
+                  ? '— Đã lọc tập trung 5 chuyên đề: Complexity, Sort, Stack/Queue, Heap, BST + AVL'
+                  : '— Đầy đủ 11 tuần học, đồ thị và bảng băm'}
+              </span>
+            </div>
+
+            <button
+              onClick={() => setMidtermOnly((m) => !m)}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 border ${
+                midtermOnly
+                  ? 'bg-amber-500 hover:bg-amber-600 text-white border-amber-400 shadow-xs'
+                  : 'bg-[#f4f4f0] dark:bg-[#181d28] hover:bg-slate-200 dark:hover:bg-[#202736] text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700'
+              }`}
+            >
+              <Flame className="w-3.5 h-3.5" />
+              <span>{midtermOnly ? 'Chuyển sang xem Tất cả' : 'Bật lọc Giữa Kỳ'}</span>
+            </button>
+          </div>
+
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -347,11 +427,14 @@ export const App: React.FC = () => {
                   onToggleTask={handleToggleTask}
                   onNavigate={handleNavigate}
                   passedAlgoCount={passedAlgoCount}
-                  totalAlgoCount={ALGORITHMS.length}
+                  totalAlgoCount={midtermOnly ? ALGORITHMS.filter((a) => a.isMidterm !== false).length : ALGORITHMS.length}
                   quizAccuracy={quizAccuracy}
+                  midtermOnly={midtermOnly}
                 />
               )}
-              {activeTab === 'slides' && <SlideReviewView onNavigate={handleNavigate} />}
+              {activeTab === 'slides' && (
+                <SlideReviewView onNavigate={handleNavigate} midtermOnly={midtermOnly} />
+              )}
               {activeTab === 'codelab' && (
                 <CodeLabView
                   selectedAlgoId={selectedAlgoId}
@@ -360,6 +443,7 @@ export const App: React.FC = () => {
                   onUpdateApiSettings={handleUpdateApiSettings}
                   algoScores={progress.algoScores}
                   onSaveAlgoScore={handleSaveAlgoScore}
+                  midtermOnly={midtermOnly}
                 />
               )}
               {activeTab === 'quiz' && (
@@ -368,9 +452,11 @@ export const App: React.FC = () => {
                   onUpdateApiSettings={handleUpdateApiSettings}
                   mcqAnswers={progress.mcqAnswers}
                   onAnswerMcq={handleAnswerMcq}
+                  midtermOnly={midtermOnly}
                 />
               )}
-              {activeTab === 'cheatsheet' && <CheatSheetView />}
+              {activeTab === 'java' && <JavaW3SchoolsView midtermOnly={midtermOnly} />}
+              {activeTab === 'cheatsheet' && <CheatSheetView midtermOnly={midtermOnly} />}
               {activeTab === 'deploy' && (
                 <DeployApiView
                   apiSettings={apiSettings}

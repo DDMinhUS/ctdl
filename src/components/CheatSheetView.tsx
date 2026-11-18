@@ -26,14 +26,26 @@ const MEMORY_AND_FORMULAS = [
   },
 ];
 
-export const CheatSheetView: React.FC = () => {
+interface CheatSheetViewProps {
+  midtermOnly?: boolean;
+}
+
+export const CheatSheetView: React.FC<CheatSheetViewProps> = ({ midtermOnly = false }) => {
   const [query, setQuery] = useState('');
 
-  const filteredTable = COMPLEXITY_TABLE.filter(
-    (row) =>
+  const filteredTable = COMPLEXITY_TABLE.filter((row) => {
+    if (midtermOnly) {
+      const name = row.name.toLowerCase();
+      // Exclude graph algorithms and hash tables in midterm mode
+      if (name.includes('hash') || name.includes('băm') || name.includes('đồ thị') || name.includes('dfs') || name.includes('bfs') || name.includes('kruskal') || name.includes('prim') || name.includes('dijkstra')) {
+        return false;
+      }
+    }
+    return (
       row.name.toLowerCase().includes(query.toLowerCase()) ||
       row.note.toLowerCase().includes(query.toLowerCase())
-  );
+    );
+  });
 
   return (
     <div className="space-y-6">

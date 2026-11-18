@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, CheckCircle2, Circle, Clock, Code2, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Circle, Clock, Code2, Flame, Sparkles } from 'lucide-react';
 import { JAVA_CRASH_COURSE, SPRINT_ROADMAP } from '../data/cheatSheet';
 import { TabId } from '../types';
 
@@ -11,6 +11,7 @@ interface RoadmapViewProps {
   passedAlgoCount: number;
   totalAlgoCount: number;
   quizAccuracy: string;
+  midtermOnly?: boolean;
 }
 
 export const RoadmapView: React.FC<RoadmapViewProps> = ({
@@ -20,9 +21,30 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
   passedAlgoCount,
   totalAlgoCount,
   quizAccuracy,
+  midtermOnly = false,
 }) => {
-  const totalTasks = SPRINT_ROADMAP.reduce((acc, p) => acc + p.tasks.length, 0);
-  const doneTasks = completedTaskIds.length;
+  const displayedRoadmap = useMemo(() => {
+    if (!midtermOnly) return SPRINT_ROADMAP;
+    // Keep phase-1 (Java, UF, Stack/Queue), phase-2 (Sorting, Complexity, Heap), phase-3 (BST, AVL)
+    // Filter out phase-4 (Đồ thị DFS/BFS)
+    return SPRINT_ROADMAP.filter((p) => p.id !== 'phase-4').map((p) => {
+      if (p.id === 'phase-3') {
+        return {
+          ...p,
+          phase: 'Chặng 3: BST & Cây Cân Bằng (AVL, LLRB)',
+          goal: 'Nắm chắc cây BST, xóa Hibbard và 4 phép xoay cân bằng cây AVL (LL, RR, LR, RL).',
+          tasks: p.tasks.filter((t) => !t.title.toLowerCase().includes('băm')),
+        };
+      }
+      return p;
+    });
+  }, [midtermOnly]);
+
+  const totalTasks = displayedRoadmap.reduce((acc, p) => acc + p.tasks.length, 0);
+  const doneTasks = displayedRoadmap.reduce(
+    (acc, p) => acc + p.tasks.filter((t) => completedTaskIds.includes(t.id)).length,
+    0
+  );
   const pct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
 
   return (
@@ -105,9 +127,21 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
         </div>
       </div>
 
-      {/* 4 Sprint Phases */}
+      {/* Midterm Filter Banner */}
+      {midtermOnly && (
+        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3 text-amber-900 dark:text-amber-200 text-xs">
+          <div className="flex items-center gap-2">
+            <Flame className="w-4 h-4 text-amber-500 shrink-0" />
+            <span>
+              <strong>Chế độ Ôn thi Giữa Kỳ đang BẬT:</strong> Đã tinh gọn chỉ hiển thị 5 chuyên đề trọng tâm: Complexity, Sort, Stack/Queue, Heap, BST + AVL. Đã ẩn các phần Đồ thị (DFS/BFS) &amp; Bảng băm mở rộng.
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Sprint Phases */}
       <div className="space-y-4">
-        {SPRINT_ROADMAP.map((phase, pIdx) => {
+        {displayedRoadmap.map((phase, pIdx) => {
           const phaseDone = phase.tasks.filter((t) => completedTaskIds.includes(t.id)).length;
           return (
             <motion.div

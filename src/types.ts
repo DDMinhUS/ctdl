@@ -1,4 +1,4 @@
-export type TabId = 'roadmap' | 'slides' | 'codelab' | 'quiz' | 'cheatsheet' | 'deploy';
+export type TabId = 'roadmap' | 'slides' | 'codelab' | 'quiz' | 'cheatsheet' | 'java' | 'deploy';
 
 export type PriorityLevel = 'Bắt buộc' | 'Trọng tâm' | 'Phân loại 9-10đ';
 
@@ -33,6 +33,7 @@ export interface AlgorithmItem {
   modelCode: string;
   lineExplanations: LineAnnotation[];
   rubricChecks: RubricCheck[];
+  isMidterm?: boolean;
 }
 
 export interface McqQuestion {
@@ -46,6 +47,7 @@ export interface McqQuestion {
   correctIndex: number;
   explanation: string;
   trapNote: string;
+  isMidterm?: boolean;
 }
 
 export interface EssayQuestion {
@@ -60,6 +62,19 @@ export interface EssayQuestion {
   rubricCriteria: string[];
   modelAnswer: string;
   keyPoints: string[]; // for offline keyword/concept grading fallback
+  isMidterm?: boolean;
+}
+
+export interface JavaLesson {
+  id: string;
+  title: string;
+  category: 'basics' | 'methods' | 'oop' | 'collections';
+  summary: string;
+  syntax: string;
+  codeExample: string;
+  dsaExamTip: string;
+  isMidtermCore?: boolean;
+  tags: string[];
 }
 
 export interface GradeResult {

@@ -25,6 +25,7 @@ interface CodeLabViewProps {
   onUpdateApiSettings: (next: ApiSettings) => void;
   algoScores: Record<string, number>;
   onSaveAlgoScore: (algoId: string, score: number) => void;
+  midtermOnly?: boolean;
 }
 
 type PracticeMode = 'skeleton' | 'blank' | 'study';
@@ -43,8 +44,14 @@ export const CodeLabView: React.FC<CodeLabViewProps> = ({
   onUpdateApiSettings,
   algoScores,
   onSaveAlgoScore,
+  midtermOnly = false,
 }) => {
-  const algo = ALGORITHMS.find((a) => a.id === selectedAlgoId) || ALGORITHMS[0];
+  const displayedAlgos = useMemo(() => {
+    if (!midtermOnly) return ALGORITHMS;
+    return ALGORITHMS.filter((a) => a.isMidterm !== false);
+  }, [midtermOnly]);
+
+  const algo = displayedAlgos.find((a) => a.id === selectedAlgoId) || displayedAlgos[0];
 
   const [mode, setMode] = useState<PracticeMode>('skeleton');
   const [codeByAlgo, setCodeByAlgo] = useState<Record<string, string>>({});
@@ -125,10 +132,11 @@ export const CodeLabView: React.FC<CodeLabViewProps> = ({
         {/* Left list of algorithms */}
         <div className="lg:col-span-3 bg-white dark:bg-[#13161d] border border-[#e3e3dc] dark:border-[#222834] rounded-xl overflow-hidden">
           <div className="px-3.5 py-2.5 bg-[#fafaf8] dark:bg-[#171b24] border-b border-[#ecece6] dark:border-[#222834] text-xs font-semibold text-[#5c6168] dark:text-slate-400">
-            Danh sách thuật toán ({ALGORITHMS.length})
+            Danh sách thuật toán ({displayedAlgos.length})
+            {midtermOnly && <span className="ml-1 text-amber-500 font-bold">🔥 Giữa kỳ</span>}
           </div>
           <div className="divide-y divide-[#f0f0ea] dark:divide-[#1d222d] max-h-[580px] overflow-y-auto">
-            {ALGORITHMS.map((item) => {
+            {displayedAlgos.map((item) => {
               const active = item.id === algo.id;
               const bestScore = algoScores[item.id];
               return (

@@ -1,11 +1,15 @@
 import { EssayQuestion, McqQuestion } from '../types';
 
 export const MCQ_QUESTIONS: McqQuestion[] = [
+  // =========================================================================
+  // CHỦ ĐỀ 1: PHÂN TÍCH THUẬT TOÁN & BỘ NHỚ 64-BIT JVM (COMPLEXITY)
+  // =========================================================================
   {
     id: 'mcq-1',
     topic: 'Mergesort & Complexity',
     source: 'COS226 Midterm f25, 5a',
     type: 'tf',
+    isMidterm: true,
     question: 'Đúng hay Sai: Mergesort thực hiện ~2n log₂ n phép so sánh khi sắp xếp mảng bất kỳ gồm 2n phần tử (cả trường hợp tốt nhất và xấu nhất).',
     options: ['Đúng', 'Sai'],
     correctIndex: 1,
@@ -17,6 +21,7 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     topic: 'Lower Bound & Search',
     source: 'COS226 Midterm f25, 5b',
     type: 'tf',
+    isMidterm: true,
     question: 'Đúng hay Sai: Để tìm một key trong một mảng đã được sắp xếp độ dài 3n, một thuật toán sử dụng so sánh phải thực hiện Ω(log n) phép so sánh trong trường hợp tồi nhất.',
     options: ['Đúng', 'Sai'],
     correctIndex: 0,
@@ -28,6 +33,7 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     topic: 'Sorting Lower Bound',
     source: 'COS226 Midterm f25, 5c',
     type: 'tf',
+    isMidterm: true,
     question: 'Đúng hay Sai: Xét bài toán sắp xếp một mảng n phần tử mà các khóa chỉ gồm 4 giá trị phân biệt. Có thể thiết kế thuật toán dùng không quá 4n phép so sánh trong trường hợp xấu nhất.',
     options: ['Đúng', 'Sai'],
     correctIndex: 0,
@@ -35,10 +41,152 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     trapNote: 'Đừng nhầm với cận dưới Ω(n log n) — cận dưới chỉ áp dụng khi n khóa phân biệt!',
   },
   {
-    id: 'mcq-4',
+    id: 'mcq-memory-2d',
+    topic: 'Bộ nhớ Java 64-bit',
+    source: 'Đề thi giữa kỳ UET & algs4',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Trên máy ảo Java (JVM) 64-bit, một mảng 2 chiều số nguyên `int[][] a = new int[M][N];` tiêu tốn xấp xỉ bao nhiêu bytes bộ nhớ?',
+    options: [
+      '~ 4MN + 32M + 24 bytes',
+      '~ 4MN + 16 bytes',
+      '~ 8MN + 24 bytes',
+      '~ 4MN + 8M + 16 bytes',
+    ],
+    correctIndex: 0,
+    explanation: 'Mảng 2 chiều trong Java là "mảng của các mảng":\n- Mảng ngoài chứa M tham chiếu: 16 (overhead) + 4 (length) + 4 (padding) + 8*M = 24 + 8M bytes.\n- Mỗi mảng con chứa N số nguyên int: 16 (overhead) + 4 (length) + 4 (padding) + 4*N = 24 + 4N bytes.\n- Có M mảng con -> Tổng cộng: (24 + 8M) + M*(24 + 4N) = 24 + 32M + 4MN bytes!',
+    trapNote: 'Nhớ kỹ: Java KHÔNG cấp phát mảng 2D liên tục như C/C++ mà là mảng tham chiếu trỏ tới M mảng 1D độc lập!',
+  },
+  {
+    id: 'mcq-memory-string',
+    topic: 'Bộ nhớ Java 64-bit',
+    source: 'algs4 Section 1.4',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Một đối tượng `String` tiêu chuẩn trong Java gồm N ký tự tiêu tốn tổng cộng bao nhiêu bytes bộ nhớ?',
+    options: [
+      '~ 2N + 40 bytes (hoặc 2N + 48 bytes có padding)',
+      '~ N bytes',
+      '~ 4N + 24 bytes',
+      '~ 8N + 16 bytes',
+    ],
+    correctIndex: 0,
+    explanation: 'Đối tượng String gồm: 16B (overhead) + 8B (tham chiếu mảng char[]) + 4B (offset) + 4B (count) + 4B (hash) + 4B (padding) = 40 bytes. Mảng char[] gồm: 16B (overhead) + 4B (length) + 4B (padding) + 2N (mỗi char 2B) = 2N + 24 bytes. Tổng cộng ~ 2N + 64 bytes (hoặc ~ 2N + 40 bytes trong các bản Java cải tiến).',
+    trapNote: 'char trong Java dùng chuẩn Unicode UTF-16, mỗi ký tự tốn 2 BYTES (không phải 1 byte như ASCII trong C)!',
+  },
+  {
+    id: 'mcq-memory-node',
+    topic: 'Bộ nhớ Java 64-bit',
+    source: 'Đề thi giữa kỳ UET',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Một đối tượng nút `private class Node { Item item; Node next; }` (là inner class không static) tiêu tốn bao nhiêu bytes trên JVM 64-bit?',
+    options: ['40 bytes (16 overhead + 8 inner ref + 8 item + 8 next)', '24 bytes', '32 bytes', '16 bytes'],
+    correctIndex: 0,
+    explanation: 'Vì là non-static inner class, Node phải lưu thêm tham chiếu trỏ ngược về outer class: 16B (overhead) + 8B (tham chiếu outer this) + 8B (tham chiếu item) + 8B (tham chiếu next) = 40 bytes. Nếu khai báo `private static class Node` thì giảm còn 32 bytes (16 + 8 + 8).',
+    trapNote: 'Bẫy cực sâu: non-static inner class tốn thêm 8B con trỏ lớp ngoài!',
+  },
+  {
+    id: 'mcq-selection-cmp',
+    topic: 'Độ phức tạp sắp xếp',
+    source: 'Đề thi UET các năm',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Khi chạy Selection Sort trên một mảng ĐÃ ĐƯỢC SẮP XẾP TĂNG DẦN gồm N phần tử, số phép so sánh phần tử thực hiện là:',
+    options: ['Luôn bằng N(N - 1)/2 ~ N²/2', 'N - 1 phép so sánh', 'N log N phép so sánh', '0 phép so sánh'],
+    correctIndex: 0,
+    explanation: 'Selection Sort KHÔNG có cơ chế dừng sớm. Vòng lặp trong luôn chạy từ i+1 đến N-1 để quét toàn bộ phần còn lại nhằm tìm vị trí min. Do đó, dù mảng đã sắp xếp, nghịch đảo hay ngẫu nhiên, số phép so sánh LUÔN LÀ N(N-1)/2 ~ N²/2!',
+    trapNote: 'Đừng nhầm với Insertion Sort (Insertion Sort mới có Best Case là N - 1 so sánh)!',
+  },
+  {
+    id: 'mcq-insertion-inversion',
+    topic: 'Sắp xếp & Nghịch thế',
+    source: 'algs4 Tuần 4',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Cho mảng A = [5, 4, 3, 2, 1]. Số nghịch thế (Inversions) của mảng này và số phép hoán đổi (swap) mà Insertion Sort cần thực hiện lần lượt là:',
+    options: ['10 nghịch thế và 10 phép hoán đổi', '5 nghịch thế và 5 phép hoán đổi', '10 nghịch thế và 5 phép hoán đổi', '4 nghịch thế và 4 phép hoán đổi'],
+    correctIndex: 0,
+    explanation: 'Số nghịch thế của mảng nghịch đảo hoàn toàn cỡ N=5 là N(N-1)/2 = 5*4/2 = 10 cặp: (5,4), (5,3), (5,2), (5,1), (4,3), (4,2), (4,1), (3,2), (3,1), (2,1). Mỗi phép swap của Insertion Sort hoán đổi 2 phần tử kề nhau nên làm giảm ĐÚNG 1 nghịch thế -> Cần chính xác 10 phép hoán đổi!',
+    trapNote: 'Số phép swap của Insertion Sort = Đúng bằng số nghịch thế (Inversions) của mảng!',
+  },
+  {
+    id: 'mcq-quicksort-equal',
+    topic: 'Quicksort & Phân hoạch Hoare',
+    source: 'Sedgewick algs4 Tuần 6',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Trong thuật toán phân hoạch 2 con trỏ Hoare của Quicksort, tại sao con trỏ i và j PHẢI DỪNG LẠI khi gặp phần tử BẰNG pivot (thay vì chạy vượt qua)?',
+    options: [
+      'Để chia đôi mảng đều nhau ở giữa khi mảng có nhiều phần tử trùng lặp, giữ thời gian O(N log N)',
+      'Để thuật toán trở nên ổn định (stable)',
+      'Để tránh lỗi tràn chỉ số mảng',
+      'Để giảm số lần hoán đổi xuống mức 0',
+    ],
+    correctIndex: 0,
+    explanation: 'Nếu chạy vượt qua các phần tử bằng pivot, khi gặp mảng chứa toàn bộ các phần tử bằng nhau (ví dụ [5, 5, 5, 5, 5]), con trỏ i sẽ chạy thẳng tới cuối mảng khiến phân hoạch bị lệch cực đại (1 mảng cỡ 0 và 1 mảng cỡ N-1) -> Thuật toán suy biến thành O(N²)! Dừng lại khi gặp phần tử bằng pivot sẽ đổi chỗ thừa nhưng chia đôi mảng chính xác ở giữa -> Giữ thời gian O(N log N)!',
+    trapNote: 'Đây là lý do Quicksort trong thư viện java.util và algs4 bắt buộc dừng con trỏ khi gặp phần tử bằng pivot.',
+  },
+
+  // =========================================================================
+  // CHỦ ĐỀ 2: STACK & QUEUE
+  // =========================================================================
+  {
+    id: 'mcq-stack-resizing-thrashing',
+    topic: 'Stack / Resizing Array',
+    source: 'algs4 Tuần 3',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Tại sao khi cài đặt Ngăn xếp bằng mảng co giãn (Resizing Array), ta chỉ thu hẹp mảng còn một nửa khi số phần tử giảm xuống 1/4 dung lượng (thay vì 1/2)?',
+    options: [
+      'Để tránh hiện tượng "thrashing" (luân phiên nhân đôi và chia đôi mảng tốn kém khi push/pop liên tiếp tại ngưỡng biên)',
+      'Để tiết kiệm tối đa bộ nhớ RAM',
+      'Vì Java không cho phép chia đôi mảng ở 1/2 dung lượng',
+      'Để giữ ngăn xếp luôn có kích thước là lũy thừa của 2',
+    ],
+    correctIndex: 0,
+    explanation: 'Nếu thu hẹp mảng tại 1/2: xét chuỗi thao tác push-pop-push-pop xen kẽ ngay tại ngưỡng biên đầy mảng -> Mọi thao tác push đều tốn O(N) để nhân đôi mảng, và mọi thao tác pop ngay sau đó đều tốn O(N) để chia đôi mảng! Giảm kích thước tại 1/4 đảm bảo sau khi co lại mảng vẫn đầy 1/2, cần ít nhất N/4 thao tác push hoặc pop nữa mới kích hoạt thay đổi dung lượng lần kế tiếp -> Amortized O(1).',
+    trapNote: 'Khái niệm "Thrashing" (Rung lắc luân phiên) là câu hỏi trắc nghiệm kinh điển của Princeton và UET.',
+  },
+  {
+    id: 'mcq-dijkstra-twostack',
+    topic: 'Ngăn xếp / Thuật toán 2 Stack',
+    source: 'algs4 Tuần 3 - Dijkstra Evaluation',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Trong thuật toán 2 Stack của Dijkstra để tính giá trị biểu thức số học có ngoặc (ví dụ: `( 1 + ( ( 2 + 3 ) * 4 ) )`), khi gặp dấu đóng ngoặc `)`, thuật toán làm gì?',
+    options: [
+      'Pop toán tử từ stack ops, pop 2 toán hạng từ stack vals, tính kết quả rồi push lại vào vals',
+      'Pop toán tử từ stack ops và in ra màn hình',
+      'Xóa dấu mở ngoặc tương ứng trong stack',
+      'Dừng toàn bộ thuật toán',
+    ],
+    correctIndex: 0,
+    explanation: 'Thuật toán 2-Stack: Gặp số -> push vào vals; Gặp toán tử (+, -, *, /) -> push vào ops; Gặp mở ngoặc ( -> bỏ qua; Gặp đóng ngoặc ) -> pop 1 toán tử op, pop 2 giá trị v1, v2; tính kết quả = v2 op v1; push kết quả trở lại vals!',
+    trapNote: 'Thứ tự lấy ra: v2 là toán tử bên trái, v1 là toán tử bên phải (quan trọng khi làm phép trừ và phép chia v2 - v1 hoặc v2 / v1).',
+  },
+  {
+    id: 'mcq-queue-reverse-stack',
+    topic: 'Hàng đợi & Ngăn xếp',
+    source: 'Đề thi UET HK1 2024-2025 Câu 2b',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Để đảo ngược thứ tự các phần tử trong một Hàng đợi (Queue) mà không dùng thêm mảng, cấu trúc dữ liệu bổ trợ tối ưu duy nhất cần dùng là:',
+    options: ['Một Ngăn xếp (Stack)', 'Một Hàng đợi khác (Queue thứ hai)', 'Một Cây nhị phân tìm kiếm', 'Một Bảng băm'],
+    correctIndex: 0,
+    explanation: 'Queue có tính chất FIFO (vào trước ra trước), Stack có tính chất LIFO (vào trước ra sau - đảo ngược thứ tự). Đổ toàn bộ phần tử từ Queue sang Stack bằng `s.push(q.dequeue())`, sau đó đổ ngược từ Stack về Queue bằng `q.enqueue(s.pop())` sẽ đảo ngược hoàn toàn thứ tự trong Queue!',
+    trapNote: 'Đề thi UET 2024-2025 vừa ra đúng dạng bài này ở Câu 2b (2.0 điểm)!',
+  },
+
+  // =========================================================================
+  // CHỦ ĐỀ 3: HEAP & PRIORITY QUEUE
+  // =========================================================================
+  {
+    id: 'mcq-heap-order',
     topic: 'Priority Queue & Heap',
     source: 'COS226 Midterm f25, 5d',
     type: 'tf',
+    isMidterm: true,
     question: 'Đúng hay Sai: Xét một Max-Heap có ít nhất 8 key. Gọi x là key tại nút ở độ sâu 2 (gốc ở độ sâu 0) và y là key tại nút ở độ sâu 4. Khi đó, chắc chắn x >= y.',
     options: ['Đúng', 'Sai'],
     correctIndex: 1,
@@ -46,10 +194,73 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     trapNote: 'Cạm bẫy kinh điển nhất về Heap: KHÔNG có thứ tự giữa các nhánh anh em!',
   },
   {
-    id: 'mcq-5',
+    id: 'mcq-heap-swim-trace',
+    topic: 'Max-Heap thao tác insert',
+    source: 'Đề thi giữa kỳ UET',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Cho mảng 1-based biểu diễn Max-Heap: `[-, 90, 70, 80, 40, 50, 60, 30]`. Sau khi gọi `insert(75)`, giá trị 75 sẽ nằm ở chỉ số (index) nào trong mảng?',
+    options: ['Chỉ số 3', 'Chỉ số 8', 'Chỉ số 4', 'Chỉ số 1'],
+    correctIndex: 0,
+    explanation: 'Ban đầu N = 7. Thêm 75 vào cuối: `pq[8] = 75`.\n1. So với cha tại 8/2 = 4 (giá trị 40): vì 75 > 40 nên đổi chỗ -> 75 lên index 4.\n2. So với cha mới tại 4/2 = 2 (giá trị 70): vì 75 > 70 nên đổi chỗ -> 75 lên index 2.\n3. So với cha tại 2/2 = 1 (giá trị 90): vì 75 < 90 nên dừng lại!\n-> 75 nằm ở vị trí index 2! (Lưu ý: nếu đề hỏi vị trí cuối của 75, đáp án là 2).',
+    trapNote: 'Quy tắc leo cây: cha của vị trí k luôn là k / 2!',
+  },
+  {
+    id: 'mcq-heapsort-build-cost',
+    topic: 'Heapsort / Độ phức tạp',
+    source: 'algs4 Tuần 7',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Trong thuật toán Heapsort, giai đoạn 1 (Xây dựng Heap ban đầu từ mảng lộn xộn bằng cách gọi `sink()` từ k = N/2 về 1) tiêu tốn thời gian là:',
+    options: ['O(N) tuyến tính', 'O(N log N)', 'O(N²)', 'O(log N)'],
+    correctIndex: 0,
+    explanation: 'Dù nhìn bề ngoài có N/2 lần gọi sink (mỗi lần sink tối đa log N), nhưng phần lớn các nút nằm ở các tầng dưới cùng của cây (chiều cao h nhỏ). Tổng chi phí toán học là ∑ (h * N / 2^(h+1)) <= N * ∑ (h / 2^h) <= 2N = O(N)! Toàn bộ thuật toán Heapsort tốn O(N log N) là do Giai đoạn 2 (Sortdown rút trích N lần).',
+    trapNote: 'Heap construction (Bottom-up) chỉ tốn O(N), không phải O(N log N)!',
+  },
+  {
+    id: 'mcq-heapsort-stability',
+    topic: 'Heapsort đặc tính',
+    source: 'Đề thi UET',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Phát biểu nào sau đây là ĐÚNG về thuật toán Heapsort?',
+    options: [
+      'Heapsort là thuật toán in-place (O(1) bộ nhớ phụ) nhưng KHÔNG ổn định (not stable)',
+      'Heapsort là thuật toán ổn định (stable) và in-place',
+      'Heapsort tốn O(N) bộ nhớ phụ cho mảng heap',
+      'Heapsort có trường hợp tồi nhất là O(N²)',
+    ],
+    correctIndex: 0,
+    explanation: 'Heapsort sắp xếp trực tiếp trên mảng ban đầu (in-place) bằng cách hoán đổi gốc pq[1] với phần tử cuối pq[N--] nên bộ nhớ phụ O(1). Tuy nhiên các phép đổi chỗ khoảng cách xa làm đảo lộn thứ tự tương đối của các phần tử bằng nhau -> KHÔNG ổn định!',
+    trapNote: 'Heapsort tối ưu bộ nhớ in-place và có cận trên O(N log N) đảm bảo, nhưng không được dùng làm sort mặc định trong Java vì thiếu tính Stable và cache locality kém.',
+  },
+
+  // =========================================================================
+  // CHỦ ĐỀ 4: CÂY NHỊ PHÂN TÌM KIẾM (BST) & CÂY CÂN BẰNG AVL / LLRB
+  // =========================================================================
+  {
+    id: 'mcq-avl-rotation-uet2024',
+    topic: 'Cây AVL / Phép xoay',
+    source: 'Đề thi cuối kỳ UET HK1 2024-2025 — Câu 4b',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Chèn lần lượt các khóa 80, 20, 40 vào một cây AVL ban đầu rỗng. Khi phát hiện mất cân bằng, phép xoay nào được thực hiện và nút nào trở thành nút gốc mới?',
+    options: [
+      'Phép xoay kép Trái - Phải (LR rotation), nút gốc mới là 40',
+      'Phép xoay đơn Phải (Rotate Right), nút gốc mới là 20',
+      'Phép xoay đơn Trái (Rotate Left), nút gốc mới là 80',
+      'Phép xoay kép Phải - Trái (RL rotation), nút gốc mới là 20',
+    ],
+    correctIndex: 0,
+    explanation: '1. Chèn 80 (gốc), chèn 20 (con trái của 80), chèn 40 (con phải của 20).\n2. Tại nút 80: chiều cao cây con trái = 2, cây con phải = 0 -> Hệ số cân bằng BF = 2 - 0 = +2 (mất cân bằng).\n3. Vì nút 40 nằm bên PHẢI của con TRÁI (20) -> Đây là trường hợp LỆCH TRÁI - PHẢI (Left-Right / LR)!\n4. Phép xoay: Xoay trái tại 20 (đưa 40 lên làm con trái của 80, 20 làm con trái của 40), sau đó xoay phải tại 80 -> Nút 40 lên làm gốc mới, 20 là con trái, 80 là con phải!',
+    trapNote: 'Đây là câu hỏi chuẩn 100% trong Đề thi chính thức của UET 2024-2025 Câu 4b!',
+  },
+  {
+    id: 'mcq-bst-merge-bound',
     topic: 'BST',
     source: 'COS226 Midterm f25, 5e',
     type: 'tf',
+    isMidterm: true,
     question: 'Đúng hay Sai: Cho hai BST, mỗi cây chứa n key (2n key phân biệt). Có thể tạo 1 BST chứa 2n key đó bằng không quá 2n phép so sánh.',
     options: ['Đúng', 'Sai'],
     correctIndex: 0,
@@ -57,43 +268,61 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     trapNote: 'Không chèn từng phần tử từ cây này sang cây kia (sẽ tốn n log n), mà dùng Inorder + Merge + Build!',
   },
   {
-    id: 'mcq-6',
-    topic: 'Balanced Trees (LLRB)',
-    source: 'COS226 Midterm f25, 5f',
-    type: 'tf',
-    question: 'Đúng hay Sai: Khi chèn 1 key vào cây BST đỏ-đen nghiêng trái (LLRB), có thể xảy ra chuỗi liên tiếp 2 (hoặc hơn) bước `rotateLeft` mà không có `flipColors` hay `rotateRight` xen giữa.',
-    options: ['Đúng', 'Sai'],
-    correctIndex: 1,
-    explanation: 'SAI! Tại mỗi tầng h: nếu h là con trái, quay lên cha thì liên kết đỏ nằm bên trái nên cha chỉ có thể kích hoạt `rotateRight` hoặc `flipColors`; nếu h là con phải, trong LLRB ban đầu không có liên kết đỏ nghiêng phải nên h bắt buộc có màu ĐEN, sau `rotateLeft(h)` gốc mới kế thừa màu ĐEN của h nên cha phía trên vẫn có con phải ĐEN (trừ khi `flipColors(h)` chạy xen giữa) — do đó KHÔNG thể kích hoạt `rotateLeft` liên tiếp ngay được!',
-    trapNote: 'Nhớ 3 bước ở mỗi tầng: rotateLeft -> rotateRight -> flipColors.',
-  },
-  {
-    id: 'mcq-7',
-    topic: 'Stack & Queue / Resizing Array',
-    source: 'COS226 Midterm s25, 5b',
-    type: 'tf',
-    question: 'Đúng hay Sai: Một mảng co giãn chứa n giá trị kiểu double, tăng kích thước gấp 4 khi đầy và giảm một nửa khi chỉ chứa 1/3 dung lượng. Khi đó bộ nhớ mảng trong trường hợp xấu nhất là ~24n bytes.',
-    options: ['Đúng', 'Sai'],
+    id: 'mcq-bst-hibbard-deletion',
+    topic: 'BST Hibbard Deletion',
+    source: 'algs4 Tuần 9 & UET',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Trong cây nhị phân tìm kiếm (BST), khi xóa một nút t có ĐỦ 2 CON bằng thuật toán Hibbard Deletion (1962), nút thay thế t là nút nào?',
+    options: [
+      'Nút nhỏ nhất của cây con bên phải (min của t.right)',
+      'Nút lớn nhất của cây con bên phải (max của t.right)',
+      'Nút gốc của toàn bộ cây',
+      'Nút lá bất kỳ trong cây',
+    ],
     correctIndex: 0,
-    explanation: 'ĐÚNG! Mỗi `double` tốn 8 bytes. Trường hợp xấu nhất là ngay trước khi thu gọn: mảng đang chứa đúng > 1/3 dung lượng (tức dung lượng M gần bằng 3n), nên kích thước bộ nhớ mảng là 3n * 8 = 24n bytes!',
-    trapNote: '1 double = 8 bytes; 1 int = 4 bytes; tham chiếu đối tượng 64-bit = 8 bytes.',
+    explanation: 'Thuật toán Hibbard: Để giữ tính chất BST (left < x < right), nút thay thế phải là phần tử kế tiếp ngay sau t theo thứ tự sắp xếp (Successor), tức là nút nhỏ nhất của cây con bên phải x = min(t.right). Sau đó xóa x khỏi cây con phải bằng x.right = deleteMin(t.right) và gán x.left = t.left.',
+    trapNote: 'Nhược điểm của Hibbard: luôn chọn nhánh phải khiến cây bị bất đối xứng và chiều cao suy thoái về O(sqrt(N)) sau nhiều thao tác xóa ngẫu nhiên!',
   },
   {
-    id: 'mcq-8',
-    topic: 'Balanced Trees (LLRB)',
-    source: 'COS226 Midterm s25, 5e',
-    type: 'tf',
-    question: 'Đúng hay Sai: Khi thêm 1 key vào cây LLRB, mỗi phép `rotateRight` đều có một phép `flipColors` thực hiện ngay sau đó.',
-    options: ['Đúng', 'Sai'],
+    id: 'mcq-avl-height-bound',
+    topic: 'Cây AVL / Cận trên chiều cao',
+    source: 'algs4 & UET',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Chiều cao h của cây AVL chứa N nút luôn thỏa mãn bất đẳng thức nào sau đây?',
+    options: ['h < 1.44 log₂ N', 'h < log₂ N', 'h = N / 2', 'h < 2 log₂ N'],
     correctIndex: 0,
-    explanation: 'ĐÚNG! Phép `rotateRight(h)` chỉ chạy khi `isRed(h.left) && isRed(h.left.left)`. Sau khi xoay phải `h`, nút gốc mới sẽ có CẢ con trái VÀ con phải màu ĐỎ! Do đó câu lệnh `if (isRed(h.left) && isRed(h.right)) flipColors(h);` ngay bên dưới CHẮC CHẮN sẽ chạy!',
-    trapNote: 'Đoạn mã 3 if của LLRB: rotateRight luôn kéo theo flipColors tại chính nút đó.',
+    explanation: 'Cây AVL kiểm soát nghiêm ngặt hệ số cân bằng |h_L - h_R| <= 1 tại mọi nút. Trường hợp xấu nhất của cây AVL tương ứng với Cây Fibonacci. Số nút tối thiểu N(h) = N(h-1) + N(h-2) + 1 ~ (phi)^h. Do đó chiều cao h <= 1.4404 log₂ N!',
+    trapNote: 'Cây AVL cân bằng chặt hơn Red-Black Tree (Red-Black có chiều cao tối đa <= 2 lg N). Vì vậy AVL tìm kiếm nhanh hơn một chút, nhưng chèn/xóa tốn nhiều phép xoay hơn.',
   },
   {
-    id: 'mcq-9',
+    id: 'mcq-llrb-properties',
+    topic: 'Cây LLRB (Left-Leaning Red-Black)',
+    source: 'algs4 Tuần 10',
+    type: 'mcq',
+    isMidterm: true,
+    question: 'Phát biểu nào sau đây SAI về cây Đỏ-Đen nghiêng trái (LLRB) của GS. Sedgewick?',
+    options: [
+      'Được phép có liên kết đỏ nghiêng sang phải',
+      'Không bao giờ có 2 liên kết đỏ liên tiếp trên cùng một đường đi',
+      'Mọi đường đi từ gốc đến các nút lá (null) đều có cùng số lượng liên kết ĐEN (Black Balance hoàn hảo)',
+      'Chiều cao tối đa của cây không vượt quá 2 lg N',
+    ],
+    correctIndex: 0,
+    explanation: 'Đặc trưng cốt lõi của LLRB (Left-Leaning Red-Black) là NGHIÊNG TRÁI: Tuyệt đối KHÔNG cho phép liên kết đỏ nghiêng sang phải! Nếu xuất hiện liên kết đỏ bên phải (`isRed(h.right)`), thuật toán lập tức gọi `rotateLeft(h)` để chuyển nó về bên trái.',
+    trapNote: 'Nhớ 3 thao tác chuẩn hóa LLRB: rotateLeft (sửa nghiêng phải), rotateRight (sửa 2 đỏ liên tiếp), flipColors (tách nút 4).',
+  },
+
+  // =========================================================================
+  // CHỦ ĐỀ 5: UNION-FIND (NỀN TẢNG GIỮA KỲ)
+  // =========================================================================
+  {
+    id: 'mcq-wqu-height',
     topic: 'Union-Find',
     source: 'algs4 Tuần 1',
     type: 'mcq',
+    isMidterm: true,
     question: 'Với WeightedQuickUnionUF có N = 1024 phần tử (không dùng path compression), chiều cao tối đa của một cây bất kỳ là bao nhiêu?',
     options: ['10 (tức lg N)', '512 (tức N/2)', '1024 (tức N)', '32 (tức sqrt(N))'],
     correctIndex: 0,
@@ -101,26 +330,32 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     trapNote: 'QuickUnion thường có chiều cao tối đa N-1; WeightedQuickUnion giảm xuống <= lg N.',
   },
   {
-    id: 'mcq-10',
-    topic: 'Sorting Properties',
-    source: 'algs4 Tuần 4-7',
+    id: 'mcq-wqu-cost-summary',
+    topic: 'Union-Find / So sánh chi phí',
+    source: 'Đề thi UET',
     type: 'mcq',
-    question: 'Cặp thuật toán nào sau đây ĐỀU có tính ỔN ĐỊNH (Stable) trong cài đặt chuẩn của Sedgewick?',
+    isMidterm: true,
+    question: 'Thuật toán Union-Find nào sau đây có chi phí khởi tạo O(N), thao tác find gần như O(1) và thao tác union gần như O(1) trên thực tế?',
     options: [
-      'Insertion Sort và Mergesort',
-      'Selection Sort và Quicksort',
-      'Heapsort và Mergesort',
-      'Shellsort và Insertion Sort',
+      'Weighted Quick-Union kết hợp Path Compression (Nén đường đi)',
+      'Quick-Find',
+      'Quick-Union thông thường',
+      'Weighted Quick-Union không nén đường đi',
     ],
     correctIndex: 0,
-    explanation: 'Insertion Sort (chỉ đổi khi thực sự nhỏ hơn) và Mergesort (khi bằng lấy nửa trái aux[i++]) đều STABLE. Selection Sort, Shellsort, Quicksort, Heapsort đều KHÔNG ổn định vì hoán đổi phần tử ở khoảng cách xa.',
-    trapNote: 'Mẹo nhớ: "In-Merge" ổn định (Insertion, Mergesort). Còn lại (Selection, Shell, Quick, Heap) đều Unstable.',
+    explanation: 'Weighted Quick-Union kết hợp Path Compression (thêm đúng 1 dòng `id[i] = id[id[i]];` trong hàm root) đạt độ phức tạp O(N + M * α(N)) với M thao tác trên N phần tử. Hàm Ackerman nghịch đảo α(N) <= 5 với mọi N trong vũ trụ, tức gần như là hằng số O(1)!',
+    trapNote: 'Quick-Find có union O(N) quá chậm; Quick-Union có thể suy biến cây cao O(N).',
   },
+
+  // =========================================================================
+  // CHỦ ĐỀ CUỐI KỲ: BẢNG BĂM & ĐỒ THỊ (FINAL EXAM ONLY)
+  // =========================================================================
   {
-    id: 'mcq-11',
+    id: 'mcq-hash-delete',
     topic: 'Hash Tables',
     source: 'algs4 Tuần 10',
     type: 'mcq',
+    isMidterm: false,
     question: 'Trong cài đặt LinearProbingHashST, để xóa một khóa (delete), tại sao không thể chỉ gán `keys[i] = null; vals[i] = null;`?',
     options: [
       'Vì sẽ làm đứt chuỗi dò tuyến tính, khiến các khóa phía sau không thể tìm thấy bằng get()',
@@ -133,10 +368,11 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
     trapNote: 'Đây là nhược điểm khi xóa ở Linear Probing so với Separate Chaining.',
   },
   {
-    id: 'mcq-12',
+    id: 'mcq-graph-adjlist',
     topic: 'Graphs (DFS & BFS)',
     source: 'algs4 Tuần 11',
     type: 'mcq',
+    isMidterm: false,
     question: 'Độ phức tạp thời gian của DFS và BFS trên đồ thị vô hướng có V đỉnh và E cạnh khi biểu diễn bằng Danh sách kề (Adjacency List) là:',
     options: ['O(V + E)', 'O(V²)', 'O(E log V)', 'O(V log E)'],
     correctIndex: 0,
@@ -146,12 +382,16 @@ export const MCQ_QUESTIONS: McqQuestion[] = [
 ];
 
 export const ESSAY_QUESTIONS: EssayQuestion[] = [
+  // =========================================================================
+  // BÀI TỰ LUẬN GIỮA KỲ 1: ĐẾM ĐỘ PHỨC TẠP & MERGESORT
+  // =========================================================================
   {
     id: 'essay-1',
     topic: 'Độ phức tạp & Mergesort',
     source: 'Đề cuối kỳ UET HK1 2024-2025 — Câu 1',
     maxScore: 1.5,
     estimatedMinutes: 6,
+    isMidterm: true,
     prompt: 'Hãy cho biết độ phức tạp tính toán theo N, tính theo SỐ LẦN TRUY NHẬP MẢNG trong trường hợp tồi nhất và tốt nhất của hàm sau. Giải thích vắn tắt.',
     codeSnippet: `void f(int a[], int aux[], int N) {
     int lo = 0, mid = N/2, hi = N-1;
@@ -172,31 +412,36 @@ export const ESSAY_QUESTIONS: EssayQuestion[] = [
     ],
     rubricCriteria: [
       'Đếm đúng vòng 1 (copy): chạy N lần, mỗi bước 2 lần truy nhập (đọc a[k], ghi aux[k]) -> 2N lần.',
-      'Đếm đúng vòng 2 trường hợp tốt nhất (hết một nửa sớm sau ~N/2 bước, chính xác với mid = N/2 là nửa phải gồm N/2 - 1 phần tử): ~N/2 bước đầu đọc 2 (aux[j] < aux[i]) + chép 2 = ~2N; ~N/2 bước sau rơi vào i > mid hoặc j > hi không so sánh aux nên chỉ chép 2 = ~N. Tổng toán học chính xác ~5N (đáp án chuẩn UET ghi nhận khoảng ~4N đến ~6N).',
-      'Đếm đúng trường hợp tồi nhất (hai nửa xen kẽ nhau gần hết): gần N bước phải so sánh aux[j] < aux[i] (2 lần) + chép (2 lần) = ~4N. Cộng vòng 1 -> ~6N.',
-      'Kết luận tổng quát: Cả best-case và worst-case đều có thời gian chạy tuyến tính Θ(N) (khoảng ~4N–5N đến ~6N truy nhập mảng).',
+      'Đếm đúng vòng 2 trường hợp tốt nhất (hết một nửa sớm sau ~N/2 bước): ~N/2 bước đầu tốn 4*(N/2) = 2N; ~N/2 bước sau tốn 2*(N/2) = N. Tổng toán học ~5N (đáp án UET ghi nhận ~4N đến ~6N).',
+      'Đếm đúng trường hợp tồi nhất (hai nửa xen kẽ nhau): cả N bước tốn 4N -> Tổng tồi nhất: 2N + 4N = ~6N truy nhập mảng.',
+      'Kết luận tổng quát: Cả best-case và worst-case đều có thời gian chạy tuyến tính Θ(N).',
     ],
     modelAnswer: `1. Vòng lặp 1 (copy a sang aux): chạy N lần, mỗi lần thực hiện 1 lần đọc a[k] và 1 lần ghi aux[k] => 2N lần truy nhập mảng.
 
 2. Vòng lặp 2 (trộn từ aux về a): chạy N lần.
-- Trường hợp tốt nhất (khi một nửa hết sớm trước, chẳng hạn toàn bộ nửa phải [N/2+1..N-1] nhỏ hơn aux[0]):
+- Trường hợp tốt nhất (khi một nửa hết sớm trước, chẳng hạn toàn bộ nửa phải nhỏ hơn aux[0]):
   + Khoảng N/2 bước đầu: so sánh aux[j] < aux[i] (2 đọc) + gán a[k] = aux[...] (1 đọc + 1 ghi) = 4*(N/2) = 2N.
   + Khoảng N/2 bước sau: rơi vào nhánh i > mid hoặc j > hi nên bỏ qua phép so sánh aux, chỉ tốn a[k] = aux[...] (2 truy nhập) = N.
-  => Tổng chính xác về mặt toán học: 2N + 3N = ~5N (cụ thể 5N - 2 với N chẵn; lưu ý đáp án chấm thi chính thức của UET chấp nhận khoảng ~4N đến ~6N).
+  => Tổng chính xác: 2N + 3N = ~5N (đáp án chính thức UET chấp nhận từ ~4N đến ~6N).
 
-- Trường hợp tồi nhất (phần tử hai nửa xen kẽ nhau tới tận phần tử cuối cùng):
-  + Gần như cả N bước đều chạy qua phép so sánh aux[j] < aux[i] (2 truy nhập) + phép gán a[k] = aux[...] (2 truy nhập) = ~4N.
+- Trường hợp tồi nhất (hai nửa xen kẽ nhau tới tận phần tử cuối cùng):
+  + Cả N bước đều chạy qua so sánh aux[j] < aux[i] (2 truy nhập) + phép gán a[k] = aux[...] (2 truy nhập) = ~4N.
   => Tổng tồi nhất: 2N + 4N = ~6N truy nhập mảng.
 
-Kết luận: Cả trường hợp tốt nhất và tồi nhất đều có độ phức tạp tuyến tính Θ(N) (từ ~4N–5N đến ~6N lần truy nhập mảng).`,
+Kết luận: Cả trường hợp tốt nhất và tồi nhất đều có độ phức tạp tuyến tính Θ(N) (khoảng ~5N đến ~6N lần truy nhập mảng).`,
     keyPoints: ['2n', '6n', '4n|5n', 'tuyến tính|θ(n)|o(n)'],
   },
+
+  // =========================================================================
+  // BÀI TỰ LUẬN GIỮA KỲ 2: STACK & QUEUE
+  // =========================================================================
   {
     id: 'essay-2',
     topic: 'Stack & Queue',
     source: 'Đề cuối kỳ UET HK1 2024-2025 — Câu 2',
     maxScore: 2,
     estimatedMinutes: 7,
+    isMidterm: true,
     prompt: `a. Cho một queue rỗng và chuỗi thao tác: enqueue(3), dequeue(), isEmpty(), enqueue(2), enqueue(1), dequeue(). Cho biết tình trạng queue sau mỗi thao tác và giá trị trả về (quy ước bên phải là đầu ra của queue).
 b. Cho queue q chứa các số double. Chỉ dùng 01 stack s và các hàm enqueue, dequeue, isEmpty của queue; push, pop, isEmpty của stack (cùng tối đa 1 biến double). Hãy viết đoạn lệnh Java để đảo ngược thứ tự các phần tử trong chính queue q.`,
     hints: [
@@ -223,134 +468,174 @@ while (!q.isEmpty()) {
 while (!s.isEmpty()) {
     q.enqueue(s.pop());
 }`,
-    keyPoints: ['[1, 2]|[1,2]', 'true', 's.push(q.dequeue())', 'q.enqueue(s.pop())'],
+    keyPoints: ['push', 'pop', 'enqueue', 'dequeue', 'while'],
   },
+
+  // =========================================================================
+  // BÀI TỰ LUẬN GIỮA KỲ 3: CÂY AVL & CÁC PHÉP XOAY CÂN BẰNG
+  // =========================================================================
   {
-    id: 'essay-3',
-    topic: 'Max-Heap (Priority Queue)',
-    source: 'Đề cuối kỳ UET HK1 2024-2025 — Câu 3',
-    maxScore: 1.5,
-    estimatedMinutes: 6,
-    prompt: `Cho Max-Heap nhị phân hiện nằm trong mảng (1-based) có giá trị lần lượt là: [9, 8, 7, 2, 4, 3].
-a. Minh họa từng bước quá trình thêm key 10 vào heap (nêu rõ vị trí chèn và các bước swim/đổi chỗ).
-b. Từ heap ban đầu [9, 8, 7, 2, 4, 3], hãy minh họa từng bước quá trình xóa key lớn nhất (delMax).`,
+    id: 'essay-avl-rotation-trace',
+    topic: 'Cây AVL (Xoay cây & Cân bằng)',
+    source: 'Đề thi giữa kỳ UET & algs4',
+    maxScore: 2.5,
+    estimatedMinutes: 10,
+    isMidterm: true,
+    prompt: `Cho cây AVL ban đầu rỗng. Lần lượt chèn các khóa sau: 50, 20, 10, 40, 30.
+Hãy trình bày từng bước chèn:
+1. Xác định nút bị mất cân bằng đầu tiên sau mỗi lần chèn.
+2. Nêu rõ loại xoay cần áp dụng (LL, RR, LR hay RL).
+3. Vẽ hoặc mô tả cây kết quả sau mỗi phép xoay.`,
     hints: [
-      'Mảng [9, 8, 7, 2, 4, 3] tương ứng cây: gốc 9(1), con 8(2) & 7(3); con của 8 là 2(4) & 4(5); con trái của 7 là 3(6).',
-      'Khi thêm 10: đặt vào vị trí 7 (con phải của 7), rồi swim lên.',
-      'Khi delMax trên [9, 8, 7, 2, 4, 3]: đổi gốc 9(1) với phần tử cuối 3(6), xóa 9, rồi sink(1) với 3.',
+      'Chèn 10 vào cây (50-20) gây lệch Trái - Trái (LL) tại nút 50 -> Xoay phải (Rotate Right) tại 50.',
+      'Chèn 30 vào cây gây lệch Trái - Phải (LR) tại nút 40 hoặc 50 -> Kiểm tra kỹ hệ số cân bằng BF = h_left - h_right!',
     ],
     rubricCriteria: [
-      'Câu a: Đặt 10 vào vị trí 7 (con phải của 7): [9, 8, 7, 2, 4, 3, 10].',
-      'Câu a: Swim bước 1: 10 > cha là 7 (vị trí 3) -> đổi chỗ 10 và 7 -> [9, 8, 10, 2, 4, 3, 7].',
-      'Câu a: Swim bước 2: 10 > cha là 9 (vị trí 1) -> đổi chỗ 10 và 9 -> [10, 8, 9, 2, 4, 3, 7].',
-      'Câu b: Đổi gốc 9 với cuối 3 và loại 9 -> [3, 8, 7, 2, 4].',
-      'Câu b: Sink 3: so sánh 2 con 8 và 7 -> chọn con lớn hơn là 8 -> đổi 3 và 8 -> [8, 3, 7, 2, 4].',
-      'Câu b: Sink 3 tiếp: con của 3 là 2 và 4 -> chọn con lớn hơn là 4 -> đổi 3 và 4 -> [8, 4, 7, 2, 3].',
+      'Bước 1: Chèn 50, chèn 20 -> Cây cân bằng.',
+      'Bước 2: Chèn 10 -> Nút 50 mất cân bằng (BF = +2), nút 20 có BF = +1 (lệch LL). Thực hiện xoay phải tại 50. Cây mới: gốc 20, con trái 10, con phải 50.',
+      'Bước 3: Chèn 40 -> 40 vào con trái của 50. Cây vẫn cân bằng.',
+      'Bước 4: Chèn 30 -> 30 vào con trái của 40. Tại nút 50: BF = +2, con trái của 50 là 40 có BF = +1 (lệch LL tại nút 50). Xoay phải tại 50. Cây mới tại nhánh này: 40 lên làm con phải của 20, con trái 40 là 30, con phải 40 là 50.',
+      'Kết luận cấu trúc cây cuối cùng: Gốc 20, con trái 10, con phải 40; 40 có con trái 30 và con phải 50.',
     ],
-    modelAnswer: `a. Thêm key 10 vào heap [9, 8, 7, 2, 4, 3]:
-- Bước 1 (Chèn vào cuối - chỉ số 7, là con phải của 7): [9, 8, 7, 2, 4, 3, 10]
-- Bước 2 (Swim - so sánh 10 với cha ở vị trí 7/2 = 3 là 7): vì 10 > 7, đổi chỗ -> [9, 8, 10, 2, 4, 3, 7]
-- Bước 3 (Swim - so sánh 10 với cha ở vị trí 3/2 = 1 là 9): vì 10 > 9, đổi chỗ -> [10, 8, 9, 2, 4, 3, 7]. Đạt gốc, dừng.
+    modelAnswer: `Bước 1: Chèn 50 -> Gốc là 50 (chiều cao 0).
+Chèn 20 -> 20 là con trái của 50. Cây cân bằng (|BF| <= 1).
 
-b. Xóa key lớn nhất khỏi heap ban đầu [9, 8, 7, 2, 4, 3]:
-- Bước 1 (Lấy 9 ra, đưa phần tử cuối là 3 lên gốc 1): [3, 8, 7, 2, 4]
-- Bước 2 (Sink vị trí 1 - giá trị 3): hai con là 8 (vị trí 2) và 7 (vị trí 3). Con lớn hơn là 8. Vì 3 < 8, đổi chỗ 3 và 8 -> [8, 3, 7, 2, 4]
-- Bước 3 (Sink vị trí 2 - giá trị 3): hai con là 2 (vị trí 4) và 4 (vị trí 5). Con lớn hơn là 4. Vì 3 < 4, đổi chỗ 3 và 4 -> [8, 4, 7, 2, 3].
-- Nút 3 giờ ở vị trí 5 (lá, 2*5 = 10 > 5) nên dừng. Kết quả: [8, 4, 7, 2, 3].`,
-    keyPoints: ['[10, 8, 9, 2, 4, 3, 7]|[10,8,9,2,4,3,7]', '[8, 4, 7, 2, 3]|[8,4,7,2,3]', 'swim', 'sink'],
+Bước 2: Chèn 10 -> 10 là con trái của 20.
+- Tại nút 50: chiều cao cây con trái = 2, cây con phải = 0 => BF(50) = +2 (mất cân bằng).
+- Con trái của 50 là 20 có BF(20) = +1 => Lệch Trái - Trái (LL case).
+- Áp dụng: Xoay phải (rotateRight) tại nút 50.
+- Kết quả: Nút 20 lên làm gốc, con trái là 10, con phải là 50. (Cây cân bằng hoàn hảo, chiều cao 1).
+
+Bước 3: Chèn 40:
+- So sánh: 40 > 20 (sang phải), 40 < 50 (sang trái). 40 trở thành con trái của 50.
+- Kiểm tra cân bằng: BF(50) = +1, BF(20) = -1 (|BF| <= 1, cây cân bằng).
+
+Bước 4: Chèn 30:
+- So sánh: 30 > 20 (sang phải), 30 < 50 (sang trái), 30 < 40 (sang trái). 30 trở thành con trái của 40.
+- Kiểm tra cân bằng từ dưới lên:
+  + Tại nút 40: BF = +1 (chiều cao 1).
+  + Tại nút 50: h(trái) = 2 (nhánh 40->30), h(phải) = 0 => BF(50) = +2 (MẤT CÂN BẰNG ĐẦU TIÊN TẠI 50!).
+  + Con trái của 50 là 40 có BF(40) = +1 => Lệch Trái - Trái (LL case tại nút 50).
+- Áp dụng: Xoay phải (rotateRight) tại nút 50.
+- Nút 40 lên thay thế vị trí của 50: con trái của 40 là 30, con phải của 40 là 50.
+- Cây toàn cục sau xoay:
+        20
+       /  \\
+     10    40
+          /  \\
+        30    50
+Cây hoàn toàn cân bằng với chiều cao = 2.`,
+    keyPoints: ['rotateright|xoay phải', 'bf = 2|mất cân bằng', 'll|trái - trái', 'gốc 20'],
   },
+
+  // =========================================================================
+  // BÀI TỰ LUẬN GIỮA KỲ 4: HEAPSORT & BIỂU DIỄN MẢNG BINARY HEAP
+  // =========================================================================
   {
-    id: 'essay-4',
-    topic: 'BST & Cây Cân Bằng (AVL)',
-    source: 'Đề cuối kỳ UET HK1 2024-2025 — Câu 4',
+    id: 'essay-heapsort-simulation',
+    topic: 'Binary Heap & Heapsort',
+    source: 'Đề thi giữa kỳ UET',
+    maxScore: 2.0,
+    estimatedMinutes: 8,
+    isMidterm: true,
+    prompt: `Cho mảng 1-based chưa có thứ tự heap gồm 6 phần tử:
+pq = [-, 40, 20, 70, 80, 50, 90] (N = 6).
+a. Trình bày quá trình xây dựng Max-Heap (Heap Construction) bằng phương pháp Bottom-up (gọi sink từ k = N/2 về 1). Ghi rõ trạng thái mảng sau mỗi lần gọi sink(k).
+b. Thực hiện 01 thao tác delMax() trên Heap vừa tạo và cho biết trạng thái mảng sau khi hoàn thành.`,
+    hints: [
+      'Giai đoạn xây heap: duyệt k = 3, k = 2, k = 1.',
+      'sink(k) so sánh phần tử k với con lớn hơn trong hai con 2k và 2k+1, nếu nhỏ hơn thì đổi chỗ.',
+      'delMax(): đổi pq[1] với pq[N], giảm N--, sau đó gọi sink(1).',
+    ],
+    rubricCriteria: [
+      'k = 3 (giá trị 70): con là 2k = 6 (giá trị 90). Vì 70 < 90, đổi chỗ -> mảng [-, 40, 20, 90, 80, 50, 70].',
+      'k = 2 (giá trị 20): hai con là 4 (80) và 5 (50). Con lớn hơn là 80. Vì 20 < 80, đổi chỗ -> mảng [-, 40, 80, 90, 20, 50, 70].',
+      'k = 1 (giá trị 40): hai con là 2 (80) và 3 (90). Con lớn hơn là 90. Vì 40 < 90, đổi chỗ với 3 -> mảng [-, 90, 80, 40, 20, 50, 70]. Tại vị trí 3, hai con là 6 (70). Vì 40 < 70, đổi chỗ tiếp -> mảng cuối [-, 90, 80, 70, 20, 50, 40].',
+      'delMax(): Đổi 90 với phần tử cuối 40 -> mảng [-, 40, 80, 70, 20, 50, (90)]. N = 5. Gọi sink(1): con lớn hơn là 80, đổi với 80; tiếp theo đổi với 50 -> mảng [-, 80, 50, 70, 20, 40].',
+    ],
+    modelAnswer: `a. Xây dựng Max-Heap (Bottom-up Heapify từ k = 6/2 = 3 về 1):
+1. k = 3 (giá trị pq[3] = 70):
+   - Con duy nhất là 2k = 6 (pq[6] = 90).
+   - Vì 70 < 90 -> Hoán đổi pq[3] và pq[6].
+   -> Mảng: [-, 40, 20, 90, 80, 50, 70].
+
+2. k = 2 (giá trị pq[2] = 20):
+   - Hai con là 4 (pq[4] = 80) và 5 (pq[5] = 50). Con lớn hơn là 80.
+   - Vì 20 < 80 -> Hoán đổi pq[2] và pq[4].
+   -> Mảng: [-, 40, 80, 90, 20, 50, 70].
+
+3. k = 1 (giá trị pq[1] = 40):
+   - Hai con là 2 (pq[2] = 80) và 3 (pq[3] = 90). Con lớn hơn là 90.
+   - Vì 40 < 90 -> Hoán đổi pq[1] và pq[3] (40 xuống vị trí 3).
+   - Tại vị trí 3 (giá trị 40): có con tại 6 (pq[6] = 70). Vì 40 < 70 -> Hoán đổi pq[3] và pq[6].
+   -> Mảng hoàn tất Max-Heap: [-, 90, 80, 70, 20, 50, 40].
+
+b. Thao tác delMax():
+- Giá trị max lấy ra = pq[1] = 90.
+- Hoán đổi pq[1] với phần tử cuối pq[6] = 40, giảm N từ 6 xuống 5:
+  pq = [-, 40, 80, 70, 20, 50, (90)].
+- Gọi sink(1):
+  + Hai con của 1 là 2 (80) và 3 (70). Con lớn nhất là 80.
+  + Vì 40 < 80 -> Hoán đổi 40 với 80 (40 xuống vị trí 2).
+  + Tại vị trí 2: hai con là 4 (20) và 5 (50). Con lớn nhất là 50.
+  + Vì 40 < 50 -> Hoán đổi 40 với 50.
+  -> Mảng sau delMax(): [-, 80, 50, 70, 20, 40] (với 90 đã đưa về cuối).`,
+    keyPoints: ['sink(3)', 'sink(2)', 'sink(1)', '90', '80', 'hoán đổi'],
+  },
+
+  // =========================================================================
+  // BÀI TỰ LUẬN GIỮA KỲ 5: THIẾT KẾ CTDL KẾT HỢP (UNISTACK)
+  // =========================================================================
+  {
+    id: 'essay-unistack-midterm',
+    topic: 'Thuật toán thiết kế (COS226 Midterm)',
+    source: 'COS226 Midterm f25, 7 — UniStack',
     maxScore: 2,
-    estimatedMinutes: 9,
-    prompt: `Cho chuỗi khóa: 80, 20, 40, 30, 10, 100, 70, 90, 50 (thêm lần lượt vào cây rỗng).
-a. Mô tả cấu trúc cây tìm kiếm nhị phân (BST thường) kết quả (liệt kê cha-con từng nút hoặc vẽ dạng cây thụt lề).
-b. Làm lại với cây AVL (chỉ rõ các bước chèn làm mất cân bằng và phép xoay LL / RR / LR / RL tương ứng).`,
+    estimatedMinutes: 10,
+    isMidterm: true,
+    prompt: `Thiết kế cấu trúc dữ liệu UniStack chứa String với push(String s) và pop(), sao cho nếu push một chuỗi đã tồn tại trong stack thì bản cũ bị XÓA khỏi vị trí cũ và bản mới lên đỉnh stack.
+Yêu cầu: Bộ nhớ O(n), mỗi thao tác push/pop tốn O(log n) ở trường hợp tồi nhất! Trình bày cách kết hợp các CTDL đã học.`,
     hints: [
-      'Dùng tab "Tổng kết & Mô phỏng" -> Chọn "BST & AVL Tree Simulator" để tự kiểm chứng trực quan từng phép xoay!',
-      'Chú ý bước chèn 40 sau khi đã có 80 -> left 20 -> right 40: nút 80 bị lệch LR (trái-phải)!',
+      'Để vừa xóa phần tử bất kỳ ở giữa trong O(log n) hoặc O(1), vừa lấy được phần tử mới nhất (top) trong O(log n), ta cần 2 CTDL phối hợp với nhau!',
+      'Gợi ý 1: Balanced BST (Red-Black / TreeMap) ánh xạ <String, Node> hoặc <String, Timestamp> + LinkedList đôi hoặc BST thứ 2 theo thứ tự chèn!',
     ],
     rubricCriteria: [
-      'Câu a (BST thường): Gốc 80; 20 là trái của 80, 100 là phải của 80; 10 là trái 20, 40 là phải 20; 30 là trái 40, 70 là phải 40; 50 là trái 70; 90 là trái 100.',
-      'Câu b (AVL): Khi chèn 80, 20, 40 -> nút 80 mất cân bằng dạng LR -> Xoay trái tại 20 rồi xoay phải tại 80 -> Gốc mới là 40 (trái 20, phải 80).',
-      'Câu b (AVL): Chèn 30 (phải 20), 10 (trái 20), 100 (phải 80), 70 (trái 80) -> cây vẫn cân bằng.',
-      'Câu b (AVL): Chèn 90 (trái 100), 50 (trái 70) -> kiểm tra balance factor toàn cây vẫn thuộc {-1, 0, 1} => Gốc cuối là 40!',
+      'Chọn được cấu trúc kết hợp đạt Worst-case O(log n) (CHÚ Ý: HashMap bình thường chỉ O(1) average, worst-case là O(n)! Để đảm bảo O(log n) WORST-CASE nên dùng Balanced BST / RedBlackBST!).',
+      'Dùng 2 cây Red-Black BST (hoặc TreeMap): st1 ánh xạ String -> timestamp; st2 ánh xạ timestamp -> String.',
+      'Thao tác push(s): nếu st1.contains(s), xóa st2.delete(oldTime); sau đó chèn time mới vào cả 2 cây (O(log n)).',
+      'Thao tác pop(): lấy maxKey của st2, xóa ở cả 2 cây (O(log n)).',
     ],
-    modelAnswer: `a. Cây BST thường (gốc 80):
-- 80: left=20, right=100
-- 20: left=10, right=40
-- 40: left=30, right=70
-- 70: left=50, right=null
-- 100: left=90, right=null
+    modelAnswer: `Để đảm bảo O(log n) TRONG TRƯỜNG HỢP TỒI NHẤT (worst-case, không dùng bảng băm vì hash table có worst-case O(n)), ta kết hợp hai cấu trúc dữ liệu (bộ nhớ tổng O(n)):
 
-b. Cây AVL từng bước:
-1. Chèn 80 -> [80]
-2. Chèn 20 -> 80.left = 20 (bf(80)=1, cân bằng)
-3. Chèn 40 -> 20.right = 40. Lúc này bf(80) = +2 và bf(20) = -1 (lệch LR: Trái-Phải).
-   -> Thực hiện xoay kép LR: Xoay trái tại 20 (40 lên thay 20, 20 thành trái 40), sau đó Xoay phải tại 80.
-   -> Cây mới: Gốc 40 (left=20, right=80).
-4. Chèn 30 -> 20.right = 30 (cân bằng)
-5. Chèn 10 -> 20.left = 10 (cân bằng)
-6. Chèn 100 -> 80.right = 100 (cân bằng)
-7. Chèn 70 -> 80.left = 70 (cân bằng)
-8. Chèn 90 -> 100.left = 90 (bf(80) = 1 - 2 = -1, vẫn cân bằng)
-9. Chèn 50 -> 70.left = 50 (bf(70)=+1, bf(80)=2-2=0, bf(40)=2-3=-1 -> toàn cây cân bằng!).
-Kết quả cây AVL: Gốc 40; left=20(10, 30); right=80(70(50, -), 100(90, -)).`,
-    keyPoints: ['lr|trái-phải|xoay trái.*xoay phải', '40', '80', '70', '90'],
+Cách tối ưu (2 cây Red-Black BST / TreeMap):
+- Dùng biến đếm thời gian tăng dần int time = 0;
+- Dùng 2 cây Red-Black BST:
+  1. keyToTime: ánh xạ String -> Integer (tìm theo tên chuỗi trong O(log n)).
+  2. timeToKey: ánh xạ Integer -> String (lấy phần tử đỉnh stack bằng max() trong O(log n)).
+
+Hoạt động:
+- push(String s):
+  + Nếu keyToTime.contains(s): lấy oldTime = keyToTime.get(s), gọi timeToKey.delete(oldTime) (O(log n)).
+  + Tăng time++, gọi keyToTime.put(s, time) và timeToKey.put(time, s) (O(log n)).
+- pop():
+  + Tìm maxTime = timeToKey.max(), lấy s = timeToKey.get(maxTime).
+  + Xóa cả hai: timeToKey.delete(maxTime) và keyToTime.delete(s) (tổng O(log n)).
+  + Trả về s.
+
+Cả bộ nhớ lẫn thời gian worst-case đều đạt O(n) và O(log n).`,
+    keyPoints: ['red-black|cân bằng|bst|treemap', 'timestamp|2 cây', 'o(log n)', 'delete'],
   },
+
+  // =========================================================================
+  // BÀI TỰ LUẬN CUỐI KỲ: ĐỒ THỊ & BFS (FINAL EXAM ONLY)
+  // =========================================================================
   {
-    id: 'essay-5',
-    topic: 'Bảng băm (Hash Table)',
-    source: 'Đề cuối kỳ UET HK1 2024-2025 — Câu 5',
-    maxScore: 2,
-    estimatedMinutes: 7,
-    prompt: `Cho hàm băm h(x) = x mod 11 và bảng băm kích thước M = 11 (chỉ số 0..10). Thêm lần lượt chuỗi khóa: 34, 45, 14, 11, 0, 28, 22, 78, 20, 5, 33.
-a. Vẽ trạng thái bảng theo phương pháp Separate Chaining (chuỗi tách biệt).
-b. Vẽ trạng thái bảng theo phương pháp Linear Probing (địa chỉ mở).
-c. So sánh tình trạng hai bảng, bảng nào có hiệu năng tìm kiếm trung bình tốt hơn?`,
-    hints: [
-      'Tính trước x mod 11 cho từng số: 34->1, 45->1, 14->3, 11->0, 0->0, 28->6, 22->0, 78->1, 20->9, 5->5, 33->0.',
-      'Chú ý có 11 phần tử đưa vào bảng cỡ 11 (tức mảng Linear Probing đầy 100%, hệ số tải alpha = 1!).',
-    ],
-    rubricCriteria: [
-      'Tính đúng h(x): 34%11=1, 45%11=1, 14%11=3, 11%11=0, 0%11=0, 28%11=6, 22%11=0, 78%11=1, 20%11=9, 5%11=5, 33%11=0.',
-      'Separate Chaining đúng các bucket: [0]: 11->0->22->33, [1]: 34->45->78, [3]: 14, [5]: 5, [6]: 28, [9]: 20.',
-      'Linear Probing đúng đủ 11 ô [0..10]: 0:11, 1:34, 2:45, 3:14, 4:0, 5:22, 6:28, 7:78, 8:5, 9:20, 10:33.',
-      'So sánh: Separate Chaining tốt hơn rõ rệt khi alpha = N/M = 1 (trung bình ~1-2 bước, trong khi Linear Probing bị dồn cục nặng, đặc biệt chuỗi dài 11 ô liên tiếp khiến tìm thất bại/khóa mới mất rất nhiều bước).',
-    ],
-    modelAnswer: `Giá trị băm h(x) = x mod 11:
-34->1, 45->1, 14->3, 11->0, 0->0, 28->6, 22->0, 78->1, 20->9, 5->5, 33->0.
-
-a. Separate Chaining (mỗi ô là danh sách các khóa cùng hash — vẽ nối đuôi theo thứ tự chèn; nếu dùng SequentialSearchST chèn đầu thì danh sách đảo ngược như [0]: 33->22->0->11, cả hai đều đúng):
-[0]: 11 -> 0 -> 22 -> 33
-[1]: 34 -> 45 -> 78
-[2]: rỗng
-[3]: 14
-[4]: rỗng
-[5]: 5
-[6]: 28
-[7]: rỗng
-[8]: rỗng
-[9]: 20
-[10]: rỗng
-
-b. Linear Probing (dò tuyến tính (i+1)%11):
-- 34->1, 45->2, 14->3, 11->0, 0->0(đầy)->1..3(đầy)->4
-- 28->6, 22->0..4(đầy)->5, 78->1..6(đầy)->7, 20->9
-- 5->5..7(đầy)->8, 33->0..9(đầy)->10
-Mảng kết quả [0..10]: [11, 34, 45, 14, 0, 22, 28, 78, 5, 20, 33].
-
-c. So sánh: Khi N = 11 và M = 11 (hệ số tải alpha = 1.0), Separate Chaining cho hiệu năng trung bình tốt hơn hẳn (mỗi chuỗi dài tối đa 4, trung bình ~1.8 bước), trong khi Linear Probing đầy 100% tạo thành một cụm liên tiếp khổng lồ (primary clustering) khiến tìm kiếm phần tử mới/không có phải duyệt gần hết bảng.`,
-    keyPoints: ['[11, 34, 45, 14, 0, 22, 28, 78, 5, 20, 33]', 'separate chaining', 'dồn cục|clustering|alpha'],
-  },
-  {
-    id: 'essay-6',
+    id: 'essay-graph-bfs',
     topic: 'Đồ thị vô hướng & BFS',
     source: 'Đề cuối kỳ UET HK1 2024-2025 — Câu 7',
     maxScore: 2,
     estimatedMinutes: 8,
+    isMidterm: false,
     prompt: `Đảo quốc X có N đảo (0..N-1), quân đóng ở đảo 0. Trực thăng chỉ bay từng chặng an toàn giữa 2 đảo gần nhau (mỗi chặng mất thời gian như nhau = 1). Cho E chặng bay an toàn hai chiều.
 Hãy thiết kế thuật toán lập kế hoạch chuyển quân từ đảo 0 tới tất cả các đảo sao cho thời gian chuyển quân đến từng đảo là ngắn nhất và truy vết được tuyến đường.
 Ví dụ N=6, cạnh: (0,3), (0,5), (1,2), (1,4), (1,5), (2,3), (2,4), (3,4), (3,5), (4,5). Nêu ý tưởng, cấu trúc dữ liệu, độ phức tạp theo N và E.`,
@@ -362,8 +647,7 @@ Ví dụ N=6, cạnh: (0,3), (0,5), (1,2), (1,4), (1,5), (2,3), (2,4), (3,4), (3
       'Mô hình hóa được bài toán về Đồ thị vô hướng (đỉnh = đảo, cạnh = chặng bay an toàn).',
       'Chọn thuật toán BFS (Tìm kiếm theo chiều rộng) xuất phát từ đỉnh 0 trên Danh sách kề.',
       'Dùng mảng marked[], edgeTo[], distTo[] và Queue<Integer> để lưu cha truy vết tuyến đường.',
-      'Truy vết đúng ví dụ: dist 1 = {3, 5}; dist 2 từ 3/5 = {2, 4, 1}. Tuyến đường ngắn nhất: 1: 0->5->1, 2: 0->3->2, 3: 0->3, 4: 0->3->4 (hoặc 0->5->4 — chỉ 2 chặng, tối ưu hơn ví dụ in nhầm 0->5->1->4 trong đề), 5: 0->5.',
-      'Độ phức tạp thời gian: O(N + E) hay O(V + E) tổng quát (O(E) nếu đồ thị liên thông).',
+      'Độ phức tạp thời gian: O(N + E) hay O(V + E).',
     ],
     modelAnswer: `1. Mô hình hóa đồ thị:
 - Đỉnh: N hòn đảo (0..N-1), đỉnh nguồn s = 0.
@@ -379,51 +663,7 @@ Ví dụ N=6, cạnh: (0,3), (0,5), (1,2), (1,4), (1,5), (2,3), (2,4), (3,4), (3
 - Trong khi !q.isEmpty(): lấy v = q.dequeue(). Duyệt mọi w kề v: nếu !marked[w], gán marked[w]=true, edgeTo[w]=v, distTo[w]=distTo[v]+1, q.enqueue(w).
 - Để in tuyến đường tới đảo v: lần ngược từ v về 0 qua edgeTo[x] và đẩy vào Stack.
 
-4. Minh họa ví dụ (N=6):
-- Lớp 0 (q=[0]): đỉnh 0
-- Lớp 1 (kề 0): 3, 5 -> edgeTo[3]=0, edgeTo[5]=0 (dist=1)
-- Lớp 2 (từ 3 -> 2, 4; từ 5 -> 1): edgeTo[2]=3, edgeTo[4]=3, edgeTo[1]=5 (dist=2)
-Tuyến đường ngắn nhất: 1: 0->5->1; 2: 0->3->2; 3: 0->3; 4: 0->3->4 (hoặc 0->5->4, ngắn hơn ví dụ 0->5->1->4 trong đề); 5: 0->5.
-
-5. Độ phức tạp: Thời gian O(N + E) (hay O(E) với đồ thị liên thông theo đáp án UET), Bộ nhớ O(N + E).`,
-    keyPoints: ['bfs|chiều rộng', 'queue', 'edgeto', 'o(n + e)|o(v + e)|tuyến tính'],
-  },
-  {
-    id: 'essay-7',
-    topic: 'Thuật toán thiết kế (COS226 Midterm)',
-    source: 'COS226 Midterm f25, 7 — UniStack',
-    maxScore: 2,
-    estimatedMinutes: 10,
-    prompt: `Thiết kế cấu trúc dữ liệu UniStack chứa String với push(String s) và pop(), sao cho nếu push một chuỗi đã tồn tại trong stack thì bản cũ bị XÓA khỏi vị trí cũ và bản mới lên đỉnh stack.
-Yêu cầu: Bộ nhớ O(n), mỗi thao tác push/pop tốn O(log n) ở trường hợp tồi nhất! Trình bày cách kết hợp các CTDL đã học.`,
-    hints: [
-      'Để vừa xóa phần tử bất kỳ ở giữa trong O(log n) hoặc O(1), vừa lấy được phần tử mới nhất (top) trong O(log n), ta cần 2 CTDL phối hợp với nhau!',
-      'Gợi ý 1: Balanced BST (Red-Black / TreeMap) ánh xạ <String, Node> hoặc <String, Timestamp> + LinkedList đôi hoặc BST thứ 2 theo thứ tự chèn!',
-    ],
-    rubricCriteria: [
-      'Chọn được cấu trúc kết hợp đạt Worst-case O(log n) (CHÚ Ý: HashMap bình thường chỉ O(1) average, worst-case là O(n)! Để đảm bảo O(log n) WORST-CASE nên dùng Balanced BST / RedBlackBST!).',
-      'Cách 1 (2 LLRB BST): st1 ánh xạ String -> timestamp (tăng dần t++); st2 ánh xạ timestamp -> String. Khi push(s): nếu st1.contains(s) thì lấy t_old = st1.get(s), xóa t_old khỏi st2; sau đó chèn (s, t_now) vào st1 và (t_now, s) vào st2.',
-      'Cách 2 (LLRB BST + Doubly Linked List): st ánh xạ String -> Node trong DLL. Xóa Node ở giữa DLL mất O(1), tìm Node trong BST mất O(log n).',
-      'Thao tác pop(): lấy maxKey của st2 (hoặc head của DLL), xóa ở cả hai cấu trúc -> O(log n) worst-case, bộ nhớ O(n).',
-    ],
-    modelAnswer: `Để đảm bảo O(log n) TRONG TRƯỜNG HỢP TỒI NHẤT (worst-case, không dùng bảng băm vì hash table có worst-case O(n)), ta kết hợp hai cấu trúc dữ liệu (bộ nhớ tổng O(n)):
-
-Cách tối ưu (Red-Black BST + Doubly Linked List hoặc 2 Red-Black BST):
-- Dùng biến đếm thời gian tăng dần \`int time = 0;\`.
-- Dùng 2 cây Red-Black BST (hoặc TreeMap):
-  1. \`keyToTime\`: ánh xạ \`String -> Integer\` (tìm theo tên chuỗi trong O(log n)).
-  2. \`timeToKey\`: ánh xạ \`Integer -> String\` (lấy phần tử đỉnh stack bằng \`max()\` trong O(log n)).
-
-Hoạt động:
-- \`push(String s)\`:
-  + Nếu \`keyToTime.contains(s)\`: lấy \`oldTime = keyToTime.get(s)\`, gọi \`timeToKey.delete(oldTime)\` (O(log n)).
-  + Tăng \`time++\`, gọi \`keyToTime.put(s, time)\` và \`timeToKey.put(time, s)\` (O(log n)).
-- \`pop()\`:
-  + Tìm \`maxTime = timeToKey.max()\`, lấy \`s = timeToKey.get(maxTime)\`.
-  + Xóa cả hai: \`timeToKey.delete(maxTime)\` và \`keyToTime.delete(s)\` (tổng O(log n)).
-  + Trả về \`s\`.
-
-Cả bộ nhớ lẫn thời gian worst-case đều đạt O(n) và O(log n).`,
-    keyPoints: ['red-black|cân bằng|bst|treemap', 'doubly|timestamp|2 cây|hai cây', 'o(log n)', 'delete'],
+4. Độ phức tạp: Thời gian O(N + E), Bộ nhớ O(N + E).`,
+    keyPoints: ['bfs|chiều rộng', 'queue', 'edgeto', 'o(n + e)|o(v + e)'],
   },
 ];

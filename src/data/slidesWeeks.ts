@@ -37,6 +37,7 @@ export interface WeekSlideData {
     correctIndex: number;
     explanation: string;
   };
+  isMidterm?: boolean;
 }
 
 export const SLIDE_WEEKS_DATA: WeekSlideData[] = [

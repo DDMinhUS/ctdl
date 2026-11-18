@@ -26,6 +26,7 @@ import { TabId } from '../types';
 
 interface SlideReviewViewProps {
   onNavigate: (tab: TabId, algoId?: string) => void;
+  midtermOnly?: boolean;
 }
 
 // ==========================================
@@ -525,24 +526,30 @@ const VisualDiagram: React.FC<{ type?: string; conceptName: string }> = ({ type,
   }
 };
 
-export const SlideReviewView: React.FC<SlideReviewViewProps> = ({ onNavigate }) => {
+export const SlideReviewView: React.FC<SlideReviewViewProps> = ({ onNavigate, midtermOnly = false }) => {
   const [selectedWeekNum, setSelectedWeekNum] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedCodeWeek, setCopiedCodeWeek] = useState<number | null>(null);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
   const [showQuizResult, setShowQuizResult] = useState<Record<number, boolean>>({});
 
-  const selectedWeek = useMemo(() => {
-    return SLIDE_WEEKS_DATA.find((w) => w.weekNumber === selectedWeekNum) || SLIDE_WEEKS_DATA[0];
-  }, [selectedWeekNum]);
+  const displayedWeeks = useMemo(() => {
+    if (!midtermOnly) return SLIDE_WEEKS_DATA;
+    return SLIDE_WEEKS_DATA.filter((w) => w.weekNumber <= 10);
+  }, [midtermOnly]);
 
-  // Global search across all weeks
+  const selectedWeek = useMemo(() => {
+    const found = displayedWeeks.find((w) => w.weekNumber === selectedWeekNum);
+    return found || displayedWeeks[0];
+  }, [displayedWeeks, selectedWeekNum]);
+
+  // Global search across displayed weeks
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return null;
     const q = searchQuery.toLowerCase().trim();
     const hits: Array<{ week: WeekSlideData; concept: SlideConcept }> = [];
 
-    SLIDE_WEEKS_DATA.forEach((w) => {
+    displayedWeeks.forEach((w) => {
       w.concepts.forEach((c) => {
         if (
           c.name.toLowerCase().includes(q) ||
@@ -556,7 +563,7 @@ export const SlideReviewView: React.FC<SlideReviewViewProps> = ({ onNavigate }) 
       });
     });
     return hits;
-  }, [searchQuery]);
+  }, [displayedWeeks, searchQuery]);
 
   const handleCopyCode = (weekNum: number, code: string) => {
     navigator.clipboard.writeText(code);
@@ -700,7 +707,7 @@ export const SlideReviewView: React.FC<SlideReviewViewProps> = ({ onNavigate }) 
         <div className="space-y-6">
           {/* Week Selector Bar */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
-            {SLIDE_WEEKS_DATA.map((w) => {
+            {displayedWeeks.map((w) => {
               const active = selectedWeekNum === w.weekNumber;
               return (
                 <button

@@ -22,6 +22,7 @@ interface QuizViewProps {
   onUpdateApiSettings: (next: ApiSettings) => void;
   mcqAnswers: Record<string, number>;
   onAnswerMcq: (qId: string, idx: number) => void;
+  midtermOnly?: boolean;
 }
 
 export const QuizView: React.FC<QuizViewProps> = ({
@@ -29,6 +30,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
   onUpdateApiSettings,
   mcqAnswers,
   onAnswerMcq,
+  midtermOnly = false,
 }) => {
   const [subTab, setSubTab] = useState<'essay' | 'mcq'>('essay');
   const [selectedEssayId, setSelectedEssayId] = useState<string>(ESSAY_QUESTIONS[0].id);
@@ -39,7 +41,17 @@ export const QuizView: React.FC<QuizViewProps> = ({
   const [grading, setGrading] = useState(false);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
 
-  const essay = ESSAY_QUESTIONS.find((q) => q.id === selectedEssayId) || ESSAY_QUESTIONS[0];
+  const displayedEssays = React.useMemo(() => {
+    if (!midtermOnly) return ESSAY_QUESTIONS;
+    return ESSAY_QUESTIONS.filter((q) => q.isMidterm !== false);
+  }, [midtermOnly]);
+
+  const displayedMcqs = React.useMemo(() => {
+    if (!midtermOnly) return MCQ_QUESTIONS;
+    return MCQ_QUESTIONS.filter((q) => q.isMidterm !== false);
+  }, [midtermOnly]);
+
+  const essay = displayedEssays.find((q) => q.id === selectedEssayId) || displayedEssays[0];
   const draft = essayDrafts[essay.id] || '';
   const grade = essayGrades[essay.id];
 
@@ -76,15 +88,22 @@ export const QuizView: React.FC<QuizViewProps> = ({
     setEssayGrades((prev) => ({ ...prev, [essay.id]: res }));
   };
 
-  const answeredCount = Object.keys(mcqAnswers).length;
-  const correctCount = MCQ_QUESTIONS.filter((q) => mcqAnswers[q.id] === q.correctIndex).length;
+  const answeredCount = Object.keys(mcqAnswers).filter((id) =>
+    displayedMcqs.some((q) => q.id === id)
+  ).length;
+  const correctCount = displayedMcqs.filter((q) => mcqAnswers[q.id] === q.correctIndex).length;
 
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#14171a] dark:text-white">
-            Đấu trường Quiz — Tự luận UET &amp; Trắc nghiệm Bẫy
+          <h1 className="text-2xl font-semibold tracking-tight text-[#14171a] dark:text-white flex items-center gap-2">
+            <span>Đấu trường Quiz — Tự luận UET &amp; Trắc nghiệm Bẫy</span>
+            {midtermOnly && (
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500 dark:text-amber-300 font-bold border border-amber-500/30">
+                🔥 Giữa kỳ
+              </span>
+            )}
           </h1>
           <p className="text-sm text-[#5c6168] dark:text-slate-400 mt-1">
             Luyện đề thật (Đề cuối kỳ 2024-2025 &amp; COS226 Midterm) — chấm điểm chi tiết bằng Gemini AI theo đúng ba-rem.
@@ -94,8 +113,8 @@ export const QuizView: React.FC<QuizViewProps> = ({
         <div className="flex gap-1 bg-[#e9e9e3] dark:bg-[#171b24] p-1 rounded-xl border border-transparent dark:border-[#242b38]">
           {(
             [
-              ['essay', `Thi Tự luận (${ESSAY_QUESTIONS.length} bài)`],
-              ['mcq', `Trắc nghiệm & Đúng/Sai (${correctCount}/${MCQ_QUESTIONS.length})`],
+              ['essay', `Thi Tự luận (${displayedEssays.length} bài)`],
+              ['mcq', `Trắc nghiệm & Đúng/Sai (${correctCount}/${displayedMcqs.length})`],
             ] as const
           ).map(([id, label]) => (
             <button
@@ -133,10 +152,10 @@ export const QuizView: React.FC<QuizViewProps> = ({
             {/* Essay Question Selector */}
             <div className="lg:col-span-4 bg-white dark:bg-[#13161d] border border-[#e3e3dc] dark:border-[#222834] rounded-xl overflow-hidden">
               <div className="px-4 py-2.5 bg-[#fafaf8] dark:bg-[#171b24] border-b border-[#ecece6] dark:border-[#222834] text-xs font-semibold text-[#5c6168] dark:text-slate-400">
-                Bộ đề Tự luận chuẩn UET &amp; COS226
+                Bộ đề Tự luận ({displayedEssays.length} bài) {midtermOnly && <span className="text-amber-500 font-bold">🔥 Giữa kỳ</span>}
               </div>
               <div className="divide-y divide-[#f0f0ea] dark:divide-[#1d222d]">
-                {ESSAY_QUESTIONS.map((q, idx) => {
+                {displayedEssays.map((q, idx) => {
                   const active = q.id === essay.id;
                   const g = essayGrades[q.id];
                   return (
@@ -359,16 +378,16 @@ export const QuizView: React.FC<QuizViewProps> = ({
           >
             <div className="bg-white dark:bg-[#13161d] border border-[#e3e3dc] dark:border-[#222834] rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
               <div className="text-sm text-[#14171a] dark:text-slate-200">
-                Đã làm <span className="font-semibold tabular-nums">{answeredCount}/{MCQ_QUESTIONS.length}</span> câu · Đúng{' '}
+                Đã làm <span className="font-semibold tabular-nums">{answeredCount}/{displayedMcqs.length}</span> câu · Đúng{' '}
                 <span className="font-semibold text-[#0f766e] dark:text-teal-400 tabular-nums">{correctCount}</span> câu
               </div>
               <div className="text-xs text-[#646970] dark:text-slate-400">
-                Gồm toàn bộ câu Đúng/Sai bẫy từ đề Midterm COS226 &amp; lý thuyết algs4
+                Gồm các câu trắc nghiệm bẫy sát đề thi Giữa kỳ &amp; Cuối kỳ UET / Princeton COS226
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {MCQ_QUESTIONS.map((q, idx) => {
+              {displayedMcqs.map((q, idx) => {
                 const chosen = mcqAnswers[q.id];
                 const isAnswered = chosen !== undefined;
                 const isRight = chosen === q.correctIndex;
