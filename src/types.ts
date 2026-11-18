@@ -1,4 +1,4 @@
-export type TabId = 'roadmap' | 'codelab' | 'quiz' | 'cheatsheet' | 'deploy';
+export type TabId = 'roadmap' | 'slides' | 'codelab' | 'quiz' | 'cheatsheet' | 'deploy';
 
 export type PriorityLevel = 'Bắt buộc' | 'Trọng tâm' | 'Phân loại 9-10đ';
 

@@ -5,6 +5,7 @@ import {
   Code2,
   Compass,
   FileCheck2,
+  GraduationCap,
   Menu,
   Moon,
   Rocket,
@@ -17,6 +18,7 @@ import { CodeLabView } from './components/CodeLabView';
 import { DeployApiView } from './components/DeployApiView';
 import { QuizView } from './components/QuizView';
 import { RoadmapView } from './components/RoadmapView';
+import { SlideReviewView } from './components/SlideReviewView';
 import { ALGORITHMS } from './data/algorithms';
 import { SPRINT_ROADMAP } from './data/cheatSheet';
 import { MCQ_QUESTIONS } from './data/quizzes';
@@ -146,6 +148,7 @@ export const App: React.FC = () => {
 
   const navItems: Array<{ id: TabId; label: string; icon: React.ReactNode; badge?: string }> = [
     { id: 'roadmap', label: 'Lộ trình cấp tốc', icon: <Compass className="w-4 h-4" />, badge: `${roadmapPct}%` },
+    { id: 'slides', label: 'Slide bài giảng', icon: <GraduationCap className="w-4 h-4" />, badge: '11 Tuần' },
     {
       id: 'codelab',
       label: 'Phòng luyện Code',
@@ -348,6 +351,7 @@ export const App: React.FC = () => {
                   quizAccuracy={quizAccuracy}
                 />
               )}
+              {activeTab === 'slides' && <SlideReviewView onNavigate={handleNavigate} />}
               {activeTab === 'codelab' && (
                 <CodeLabView
                   selectedAlgoId={selectedAlgoId}
