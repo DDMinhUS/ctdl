@@ -527,7 +527,7 @@ const VisualDiagram: React.FC<{ type?: string; conceptName: string }> = ({ type,
 };
 
 export const SlideReviewView: React.FC<SlideReviewViewProps> = ({ onNavigate, midtermOnly = false }) => {
-  const [selectedWeekNum, setSelectedWeekNum] = useState<number>(1);
+  const [selectedWeekNum, setSelectedWeekNum] = useState<number>(() => (midtermOnly ? 2 : 1));
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedCodeWeek, setCopiedCodeWeek] = useState<number | null>(null);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
@@ -535,7 +535,63 @@ export const SlideReviewView: React.FC<SlideReviewViewProps> = ({ onNavigate, mi
 
   const displayedWeeks = useMemo(() => {
     if (!midtermOnly) return SLIDE_WEEKS_DATA;
-    return SLIDE_WEEKS_DATA.filter((w) => w.isMidterm !== false);
+    return SLIDE_WEEKS_DATA.filter((w) => w.isMidterm !== false).map((w) => {
+      if (w.weekNumber === 10) {
+        return {
+          ...w,
+          title: 'Cây cân bằng AVL (4 Phép xoay: LL, RR, LR, RL)',
+          subtitle: 'Kiểm soát cân bằng nghiêm ngặt |bf| <= 1, công thức chiều cao Fibonacci h <= 1.44 lg N, 4 phép xoay thi giấy',
+          summary:
+            'Trọng tâm thi giữa kỳ UET (Câu 4b): Cây AVL kiểm soát hệ số cân bằng bf(x) = height(left) - height(right) thuộc {-1, 0, 1}. Khi chèn làm mất cân bằng, thực hiện 1 trong 4 phép xoay (LL, RR, LR, RL) và luôn vẽ trạng thái trung gian để ăn trọn điểm.',
+          examWeight: '2.0 – 2.5 điểm (Câu 4b xoay cây AVL bắt buộc)',
+          concepts: w.concepts.filter(
+            (c) => c.visualType === 'avl-rotations' || c.name.toLowerCase().includes('avl')
+          ),
+          javaCodeHighlight: {
+            title: 'Mã nguồn sống còn: 4 Phép xoay AVL & Cập nhật Height',
+            description: 'Đoạn mã cốt lõi cài đặt rotateRight, rotateLeft và cập nhật chiều cao nút.',
+            code: `// Xoay phai (LL)
+private Node rotateRight(Node y) {
+    Node x = y.left;
+    Node T2 = x.right;
+    x.right = y;
+    y.left = T2;
+    y.height = 1 + Math.max(height(y.left), height(y.right));
+    x.height = 1 + Math.max(height(x.left), height(x.right));
+    return x;
+}
+
+// Xoay trai (RR)
+private Node rotateLeft(Node x) {
+    Node y = x.right;
+    Node T2 = y.left;
+    y.left = x;
+    x.right = T2;
+    x.height = 1 + Math.max(height(x.left), height(x.right));
+    y.height = 1 + Math.max(height(y.left), height(y.right));
+    return y;
+}`,
+          },
+          examTraps: [
+            {
+              trapTitle: 'Chỉ vẽ mỗi cây kết quả cuối cùng mà không vẽ trạng thái trung gian',
+              trapDetail:
+                'Đề thi UET luôn yêu cầu: "Vẽ các tình trạng trung gian để thấy các công đoạn xoay chỉnh cho cân bằng nếu có". Nếu chỉ vẽ đáp số cuối sẽ bị trừ 50% số điểm của câu!',
+              howToAvoid:
+                'Luôn vẽ: Cây khi vừa chèn bị lệch -> Ghi tên phép xoay (vd: Xoay kép LR) -> Cây sau khi xoay nhánh con -> Cây sau khi xoay gốc.',
+            },
+            {
+              trapTitle: 'Cập nhật chiều cao sai thứ tự (cập nhật nút cha trước nút con)',
+              trapDetail:
+                'Trong phép xoay, vị trí các nút bị đảo. Nếu tính height của nút cha mới trước khi nút con hoàn thành height, toàn bộ cây bên trên sẽ bị sai bf.',
+              howToAvoid:
+                'Luôn cập nhật height cho nút bị hạ xuống trước, sau đó mới cập nhật height cho nút được đôn lên làm gốc.',
+            },
+          ],
+        };
+      }
+      return w;
+    });
   }, [midtermOnly]);
 
   useEffect(() => {
@@ -543,6 +599,12 @@ export const SlideReviewView: React.FC<SlideReviewViewProps> = ({ onNavigate, mi
       setSelectedWeekNum(displayedWeeks[0].weekNumber);
     }
   }, [displayedWeeks, selectedWeekNum]);
+
+  useEffect(() => {
+    if (midtermOnly && selectedWeekNum === 1) {
+      setSelectedWeekNum(2);
+    }
+  }, [midtermOnly, selectedWeekNum]);
 
   const selectedWeek = useMemo(() => {
     const found = displayedWeeks.find((w) => w.weekNumber === selectedWeekNum);
@@ -591,22 +653,36 @@ export const SlideReviewView: React.FC<SlideReviewViewProps> = ({ onNavigate, mi
           <div className="space-y-2 max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-mono font-medium">
               <GraduationCap className="w-3.5 h-3.5 text-blue-400" />
-              <span>GIÁO TRÌNH CHUẨN SLIDE UET & ALGS4 SEDGEWICK</span>
+              <span>
+                {midtermOnly
+                  ? 'TRỌNG TÂM ÔN GIỮA KỲ: 5 CHUYÊN ĐỀ (COMPLEXITY, SORT, STACK/QUEUE, HEAP, BST + AVL)'
+                  : 'GIÁO TRÌNH CHUẨN SLIDE UET & ALGS4 SEDGEWICK'}
+              </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-              Cẩm Nang Slide Bài Giảng Từng Tuần
+              {midtermOnly ? 'Cẩm Nang Slide Ôn Thi Giữa Kỳ' : 'Cẩm Nang Slide Bài Giảng Từng Tuần'}
             </h1>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Tổng hợp 12 tuần học cốt lõi phục vụ ôn thi giữa kỳ & cuối kỳ môn Cấu trúc dữ liệu và Giải thuật (INT2210).
-              Được diễn giải với trực giác thực tế ("kèm 1-1"), công thức toán học bất biến, code mẫu thi giấy, bẫy trừ điểm và bài tập kiểm tra tức thì.
+              {midtermOnly ? (
+                <>
+                  Chế độ giữa kỳ đã kích hoạt: Tự động lọc tập trung{' '}
+                  <strong className="text-amber-300">5 chuyên đề thi giữa kỳ</strong> (Complexity, Sort,
+                  Stack/Queue, Heap, BST + AVL). Đã loại bỏ hoàn toàn các phần thi cuối kỳ: Tuần 1 (Union-Find),
+                  Cây Đỏ-Đen (LLRB), Bảng băm (Hash Tables) và Đồ thị (DFS/BFS/MST).
+                </>
+              ) : (
+                'Tổng hợp 12 tuần học cốt lõi phục vụ ôn thi giữa kỳ & cuối kỳ môn Cấu trúc dữ liệu và Giải thuật (INT2210). Được diễn giải với trực giác thực tế ("kèm 1-1"), công thức toán học bất biến, code mẫu thi giấy, bẫy trừ điểm và bài tập kiểm tra tức thì.'
+              )}
             </p>
           </div>
 
           {/* Quick Stats Badges */}
           <div className="flex flex-row md:flex-col gap-3 shrink-0">
             <div className="px-4 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-center">
-              <div className="text-xs text-slate-400">Tổng tài liệu</div>
-              <div className="text-lg font-bold text-sky-400 font-mono">11+ Tuần / 600+ Trang</div>
+              <div className="text-xs text-slate-400">{midtermOnly ? 'Nội dung giữa kỳ' : 'Tổng tài liệu'}</div>
+              <div className="text-lg font-bold text-sky-400 font-mono">
+                {midtermOnly ? `${displayedWeeks.length} Chuyên đề` : '12 Tuần / 600+ Trang'}
+              </div>
             </div>
             <div className="px-4 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-center">
               <div className="text-xs text-slate-400">Chuẩn đầu ra</div>
